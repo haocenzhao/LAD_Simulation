@@ -1,0 +1,17 @@
+# Macro file for LAD Geant4 DIS simulation
+# Run with:
+# ./LAD -m dis.mac
+
+# Multi-threading options
+# Uncomment these lines if the executable supports Geant4 MT mode.
+#/run/numberOfThreads 4
+#/control/cout/ignoreThreadsExcept 0
+
+# Initialize Geant4
+/run/initialize
+
+# Print progress every 1000 events
+/run/printProgress 1000
+
+# Run events
+/run/beamOn 10000

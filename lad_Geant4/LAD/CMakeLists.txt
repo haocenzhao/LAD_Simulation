@@ -64,6 +64,7 @@ set(LAD_SCRIPTS
   run1.mac
   run2.mac
   vis.mac
+  dis.mac
   )
 
 foreach(_script ${LAD_SCRIPTS})
