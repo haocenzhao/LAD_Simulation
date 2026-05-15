@@ -1,0 +1,140 @@
+[
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/LAD.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/LAD.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/LAD.cc",
+  "output": "CMakeFiles/LAD.dir/LAD.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/ActionInitialization.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/ActionInitialization.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/ActionInitialization.cc",
+  "output": "CMakeFiles/LAD.dir/src/ActionInitialization.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/EventAction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/EventAction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/EventAction.cc",
+  "output": "CMakeFiles/LAD.dir/src/EventAction.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/HistoManager.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/HistoManager.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/HistoManager.cc",
+  "output": "CMakeFiles/LAD.dir/src/HistoManager.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/HodoAnalysis.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/HodoAnalysis.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/HodoAnalysis.cc",
+  "output": "CMakeFiles/LAD.dir/src/HodoAnalysis.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADActionInitialization.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADActionInitialization.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADActionInitialization.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADActionInitialization.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADConstants.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADConstants.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADConstants.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADConstants.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADDetectorConstruction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADDetectorConstruction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADDetectorConstruction.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADDetectorConstruction.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADDetectorConstructionGEMCreator.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADDetectorConstructionGEMCreator.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADDetectorConstructionGEMCreator.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADDetectorConstructionGEMCreator.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADDetectorConstructionHodoCreator.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADDetectorConstructionHodoCreator.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADDetectorConstructionHodoCreator.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADDetectorConstructionHodoCreator.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADEventAction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADEventAction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADEventAction.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADEventAction.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADGEMHit.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADGEMHit.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADGEMHit.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADGEMHit.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADGEMSD.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADGEMSD.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADGEMSD.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADGEMSD.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADHodoHit.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADHodoHit.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADHodoHit.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADHodoHit.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADHodoSD.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADHodoSD.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADHodoSD.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADHodoSD.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADLUNDReader.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADLUNDReader.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADLUNDReader.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADLUNDReader.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADMaterials.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADMaterials.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADMaterials.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADMaterials.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADPrimaryGeneratorAction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADPrimaryGeneratorAction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADPrimaryGeneratorAction.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADPrimaryGeneratorAction.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADRunAction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADRunAction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADRunAction.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADRunAction.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADSteppingAction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADSteppingAction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADSteppingAction.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADSteppingAction.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/LADVariables.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADVariables.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/LADVariables.cc",
+  "output": "CMakeFiles/LAD.dir/src/LADVariables.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/PrimaryGeneratorAction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/PrimaryGeneratorAction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/PrimaryGeneratorAction.cc",
+  "output": "CMakeFiles/LAD.dir/src/PrimaryGeneratorAction.cc.o"
+},
+{
+  "directory": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/build",
+  "command": "/usr/bin/g++ -DG4LIB_BUILD_DLL -DG4UI_USE_QT -DG4UI_USE_XM -DG4VIS_USE_OI -DG4VIS_USE_OIX -DG4VIS_USE_OPENGLQT -DG4VIS_USE_OPENGLX -DG4VIS_USE_OPENGLXM -DG4VIS_USE_RAYTRACERX -DG4VIS_USE_TOOLSSG_QT_GLES -DG4VIS_USE_TOOLSSG_QT_ZB -DG4VIS_USE_TOOLSSG_X11_GLES -DG4VIS_USE_TOOLSSG_XT_GLES -DG4VIS_USE_TOOLSSG_XT_ZB -DPTL_BUILD_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/include -I/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/shared/include -I/home/ayerbe/Builds/ROOT6_install/include -isystem /home/ayerbe/Builds/geant4-v11.2.0-install/include/Geant4 -isystem /usr/include/qt5 -isystem /usr/include/qt5/QtGui -isystem /usr/include/qt5/QtCore -isystem /usr/lib64/qt5/mkspecs/linux-g++ -isystem /usr/include/qt5/QtOpenGL -isystem /usr/include/qt5/QtWidgets -g -fPIC -o CMakeFiles/LAD.dir/src/RunAction.cc.o -c /home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/RunAction.cc",
+  "file": "/home/ayerbe/Analysis/HallC/LAD/G4/LADHodo/src/RunAction.cc",
+  "output": "CMakeFiles/LAD.dir/src/RunAction.cc.o"
+}
+]
