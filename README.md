@@ -17,7 +17,7 @@ make -j20
 ## Build LAD SimC
 
 ```tcsh
-module unload root geant4 cmake
+module unload root
 module load root/6.30.04-gcc11.4.0
 
 cd simc_dis_lad/
