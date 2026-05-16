@@ -46,6 +46,7 @@ setenv DIS_EVENT_COUNT 1000
 Run with:
 
 ```bash
+chmod +x *.tcsh *.csh
 ./run_simulation.tcsh
 ```
 
