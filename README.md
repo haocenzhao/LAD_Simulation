@@ -2,7 +2,31 @@
 simc: forked from https://github.com/JeffersonLab/simc_gfortran;  
 geant4: forked from https://github.com/ayerbeg/LAD;
 
+##Build LAD Geant4
 
+```tcsh
+module unload root geant4 cmake
+module load geant4/11.2.2 root/6.30.06-gcc11.4.0 cmake/3.30.2
+
+cd lad_Geant4/build_lad/
+cmake ../LAD/
+make -j20
+```
+
+##Build LAD SimC
+
+```tcsh
+module unload root geant4 cmake
+module load root/6.30.04-gcc11.4.0
+
+cd simc_dis_lad/
+gmake clean
+gmake
+
+cd util/root_tree
+gmake clean
+gmake
+```
 
 ## DIS Simulation Workflow
 
