@@ -28,7 +28,7 @@ endif
 # =========================
 set TOP_DIR = `pwd`
 
-setenv RUN_TAG `date "+%Y-%m-%d-%H-%M-%S"`
+setenv RUN_TAG "`date "+%Y-%m-%d-%H-%M-%S"`_${DIS_EVENT_COUNT}Events"
 setenv RUN_OUTPUT_DIR ${TOP_DIR}/Output/origin_output/${RUN_TAG}
 
 setenv HMS_SIMC_INFILE dis_hms_e
@@ -192,3 +192,42 @@ echo "HMS_SIMC_ROOT  = $HMS_SIMC_ROOT"
 echo "SHMS_SIMC_ROOT = $SHMS_SIMC_ROOT"
 echo "DIS_ROOT_COPY  = $RUN_DIS_ROOT_FILE"
 echo "DIS_DAT_FILE   = $DIS_DAT_FILE"
+
+
+# =========================
+# Merge SimC and LAD Geant4 outputs
+# =========================
+echo "Merging SimC and LAD Geant4 outputs..."
+
+setenv HMS_OUTPUT_DIR ${TOP_DIR}/Output/hms/${RUN_TAG}
+setenv SHMS_OUTPUT_DIR ${TOP_DIR}/Output/shms/${RUN_TAG}
+
+mkdir -p $HMS_OUTPUT_DIR/log
+mkdir -p $SHMS_OUTPUT_DIR/log
+
+setenv HMS_MERGED_ROOT ${HMS_OUTPUT_DIR}/hms_g4.root
+setenv SHMS_MERGED_ROOT ${SHMS_OUTPUT_DIR}/shms_g4.root
+
+setenv MERGE_MACRO ${TOP_DIR}/merge_simc_g4.C
+
+echo "Merging HMS SimC with LAD Geant4..."
+root -l -b -q ${MERGE_MACRO}\(\"${HMS_SIMC_ROOT}\",\"${LAD_G4_ROOT}\",\"${HMS_MERGED_ROOT}\",\"hms\"\) >& ${HMS_OUTPUT_DIR}/log/merge_hms_g4.log
+
+if ( $status != 0 ) then
+  echo "ERROR: HMS merge failed. See:"
+  echo "  ${HMS_OUTPUT_DIR}/log/merge_hms_g4.log"
+  exit 1
+endif
+
+echo "Merging SHMS SimC with LAD Geant4..."
+root -l -b -q ${MERGE_MACRO}\(\"${SHMS_SIMC_ROOT}\",\"${LAD_G4_ROOT}\",\"${SHMS_MERGED_ROOT}\",\"shms\"\) >& ${SHMS_OUTPUT_DIR}/log/merge_shms_g4.log
+
+if ( $status != 0 ) then
+  echo "ERROR: SHMS merge failed. See:"
+  echo "  ${SHMS_OUTPUT_DIR}/log/merge_shms_g4.log"
+  exit 1
+endif
+
+echo "Merged output files:"
+echo "HMS_MERGED_ROOT  = $HMS_MERGED_ROOT"
+echo "SHMS_MERGED_ROOT = $SHMS_MERGED_ROOT"
