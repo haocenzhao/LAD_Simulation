@@ -2,7 +2,7 @@
 simc: forked from https://github.com/JeffersonLab/simc_gfortran;  
 geant4: forked from https://github.com/ayerbeg/LAD;
 
-##Build LAD Geant4
+## Build LAD Geant4
 
 ```tcsh
 module unload root geant4 cmake
@@ -13,7 +13,7 @@ cmake ../LAD/
 make -j20
 ```
 
-##Build LAD SimC
+## Build LAD SimC
 
 ```tcsh
 module unload root geant4 cmake
