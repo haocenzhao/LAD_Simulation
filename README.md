@@ -52,7 +52,7 @@ Run with:
 Each run creates a timestamped output directory:
 
 ```txt
-Output/origin_output/YYYY-MM-DD-HH-MM-SS/
+Output/origin_output/YYYY-MM-DD-HH-MM-SS_NEVENTSEvents/
 ```
 
 Workflow:
@@ -105,12 +105,39 @@ Workflow:
 
    These produce the LAD Geant4, HMS SimC, and SHMS SimC ROOT outputs.
 
-The generated simulation ROOT files, copied DIS ROOT file, converted `.dat` file, and diagnostic plots are saved in the timestamped output directory.
+6. Merge the accepted SimC events with the corresponding LAD Geant4 events.
 
-Log files are collected under:
+   This is done with:
+
+   ```txt
+   merge_simc_g4.C
+   ```
+
+   The SimC `h10.event_id` branch is used to select the matching Geant4 event from `hodoenergy.EventID`.  
+   The merged SimC tree is renamed to `hms` or `shms`, while the selected Geant4 trees are written alongside it.
+
+The original generated simulation ROOT files, copied DIS ROOT file, converted `.dat` file, and diagnostic plots are saved in:
 
 ```txt
-Output/origin_output/YYYY-MM-DD-HH-MM-SS/log/
+Output/origin_output/YYYY-MM-DD-HH-MM-SS_NEVENTSEvents/
 ```
 
-6. TODO： add these result root file together
+Log files for the original workflow are collected under:
+
+```txt
+Output/origin_output/YYYY-MM-DD-HH-MM-SS_NEVENTSEvents/log/
+```
+
+Merged outputs are saved in:
+
+```txt
+Output/hms/YYYY-MM-DD-HH-MM-SS_NEVENTSEvents/hms_g4.root
+Output/shms/YYYY-MM-DD-HH-MM-SS_NEVENTSEvents/shms_g4.root
+```
+
+Merge logs are saved in:
+
+```txt
+Output/hms/YYYY-MM-DD-HH-MM-SS_NEVENTSEvents/log/merge_hms_g4.log
+Output/shms/YYYY-MM-DD-HH-MM-SS_NEVENTSEvents/log/merge_shms_g4.log
+```
