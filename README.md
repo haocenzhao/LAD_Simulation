@@ -42,6 +42,7 @@ setenv DIS_EVENT_COUNT 1000
 
 - `DIS_ROOT_FILE`: input DIS generator ROOT file.
 - `DIS_EVENT_COUNT`: number of DIS events to process.
+  - If `DIS_EVENT_COUNT` is larger than the available DIS events, the script prints a warning and uses the maximum available event count from the converted `.dat` file.
 
 Run with:
 
