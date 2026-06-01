@@ -4,11 +4,11 @@
 # User settings
 # =========================
 # path to dis root file
-setenv DIS_ROOT_FILE /w/hallc-scshelf2102/c-lad/haocen/Deuteron_DIS/GEMC/generator/10.2/tagged_full/PRC/test_band_tagged_full_PRC_E10.2GeV_recp.root
+# setenv DIS_ROOT_FILE /w/hallc-scshelf2102/c-lad/haocen/Deuteron_DIS/GEMC/generator/10.2/tagged_full/PRC/test_band_tagged_full_PRC_E10.2GeV_recp.root
+setenv DIS_ROOT_FILE /volatile/hallc/c-lad/ehingerl/GEMC/generator/10.2/tagged_full/PRC/LAD_tagged_full_PRC_E10.2GeV_recp.root
 
 # num of events: must > 0
-setenv DIS_EVENT_COUNT 1000
-
+setenv DIS_EVENT_COUNT 200000
 
 # =========================
 # Initialize module command
@@ -27,8 +27,9 @@ endif
 # Paths and run tag
 # =========================
 set TOP_DIR = `pwd`
+set RUN_TIME_TAG = `date "+%Y-%m-%d-%H-%M-%S"`
 
-setenv RUN_TAG "`date "+%Y-%m-%d-%H-%M-%S"`_${DIS_EVENT_COUNT}Events"
+setenv RUN_TAG ${RUN_TIME_TAG}_${DIS_EVENT_COUNT}Events
 setenv RUN_OUTPUT_DIR ${TOP_DIR}/Output/origin_output/${RUN_TAG}
 
 setenv HMS_SIMC_INFILE dis_hms_e
@@ -142,6 +143,48 @@ cd $TOP_DIR
 rm -f $ROOT2DAT_MACRO
 
 # =========================
+# Cap event count using converted DIS dat file
+# =========================
+set DIS_DAT_EVENT_COUNT = `awk 'BEGIN{n=0} /^[[:space:]]*#/ {next} /^[[:space:]]*$/ {next} {n++} END{print n}' $DIS_DAT_FILE`
+
+if ( $DIS_DAT_EVENT_COUNT <= 0 ) then
+  echo "ERROR: no DIS events found in dat file:"
+  echo "  $DIS_DAT_FILE"
+  exit 1
+endif
+
+if ( $DIS_EVENT_COUNT > $DIS_DAT_EVENT_COUNT ) then
+  echo "==================== WARNING ===================="
+  echo "Requested DIS_EVENT_COUNT = $DIS_EVENT_COUNT is larger than the available events in the DIS ROOT/dat file."
+  echo "Using the maximum available event count instead: $DIS_DAT_EVENT_COUNT"
+  echo "================================================="
+
+  set OLD_RUN_OUTPUT_DIR = $RUN_OUTPUT_DIR
+
+  setenv DIS_EVENT_COUNT $DIS_DAT_EVENT_COUNT
+  @ SIMC_EVENT_COUNT = -1 * $DIS_EVENT_COUNT
+  setenv SIMC_EVENT_COUNT $SIMC_EVENT_COUNT
+
+  setenv RUN_TAG ${RUN_TIME_TAG}_${DIS_EVENT_COUNT}Events
+  setenv RUN_OUTPUT_DIR ${TOP_DIR}/Output/origin_output/${RUN_TAG}
+
+  if ( -e $RUN_OUTPUT_DIR ) then
+    echo "ERROR: capped output directory already exists:"
+    echo "  $RUN_OUTPUT_DIR"
+    exit 1
+  endif
+
+  mv $OLD_RUN_OUTPUT_DIR $RUN_OUTPUT_DIR
+
+  setenv RUN_DIS_ROOT_FILE ${RUN_OUTPUT_DIR}/${DIS_ROOT_BASE}.root
+  setenv DIS_DAT_FILE ${RUN_OUTPUT_DIR}/${DIS_ROOT_BASE}.dat
+endif
+
+echo "Final output directory: $RUN_OUTPUT_DIR"
+echo "Final G4 events       = $DIS_EVENT_COUNT"
+echo "Final SimC events     = $SIMC_EVENT_COUNT"
+
+# =========================
 # Update Geant4 and SimC input files
 # =========================
 echo "Updating Geant4 and SimC input files..."
@@ -186,13 +229,11 @@ foreach logfile ( $RUN_OUTPUT_DIR/*.log )
 end
 
 echo "Output files:"
-#ls -lh $RUN_OUTPUT_DIR
 echo "LAD_G4_ROOT    = $LAD_G4_ROOT"
 echo "HMS_SIMC_ROOT  = $HMS_SIMC_ROOT"
 echo "SHMS_SIMC_ROOT = $SHMS_SIMC_ROOT"
 echo "DIS_ROOT_COPY  = $RUN_DIS_ROOT_FILE"
 echo "DIS_DAT_FILE   = $DIS_DAT_FILE"
-
 
 # =========================
 # Merge SimC and LAD Geant4 outputs
