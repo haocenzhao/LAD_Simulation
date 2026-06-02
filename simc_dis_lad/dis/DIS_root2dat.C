@@ -16,7 +16,7 @@
 //   1) theta-phi TH2F for recoil particle prec and scattered electron pe
 //   2) momentum magnitude TH1F for prec and pe
 //   3) pz vs p_perp TH2F for prec and pe
-//   4) p vs theta TH2F for prec and pe
+//   4) p vs theta TH2F for prec and pe, plus p vs phi TH2F for pe
 //   5) all plots saved into the existing pdf as a multi-page PDF
 
 #include <TFile.h>
@@ -166,6 +166,12 @@ void DIS_root2dat() {
       85, 0.0, 190.0,
       100, 0.0, 10000.0);
 
+  TH2D* h_p_vs_phi_e = new TH2D(
+    "h_p_vs_phi_e",
+    "Scattered electron p vs #phi;#phi [deg];p [MeV/c]",
+    190, -190.0, 190.0,
+    100, 0.0, 10000.0);  
+
   const Long64_t N = T->GetEntries();
   for (Long64_t i = 0; i < N; i++) {
     T->GetEntry(i);
@@ -232,6 +238,7 @@ void DIS_root2dat() {
     h_p_e->Fill(p_e, weight);
     h_pz_vs_p_e->Fill(pt_e, pe2, weight);
     h_p_vs_theta_e->Fill(theta_e_deg, p_e, weight);
+    h_p_vs_phi_e->Fill(phi_e_deg, p_e, weight);
   }
 
   std::cout << "Wrote " << N << " events to " << outFile << "\n";
@@ -380,7 +387,16 @@ void DIS_root2dat() {
   h_p_vs_theta_e->Draw("COLZ");
   c_p_vs_theta_e->Print(figPdf.c_str());
 
-  c_p_vs_theta_e->Print((figPdf + "]").c_str());
+  // Scattered electron: p vs phi
+  TCanvas* c_p_vs_phi_e = new TCanvas("c_p_vs_phi_e", "p_vs_phi_e", 800, 650);
+  c_p_vs_phi_e->SetLeftMargin(0.12);
+  c_p_vs_phi_e->SetRightMargin(0.14);
+  c_p_vs_phi_e->SetBottomMargin(0.12);
+  c_p_vs_phi_e->SetTopMargin(0.08);
+  h_p_vs_phi_e->Draw("COLZ");
+  c_p_vs_phi_e->Print(figPdf.c_str());
+
+  c_p_vs_phi_e->Print((figPdf + "]").c_str());
 
   std::cout << "Saved plots to " << figPdf << "\n";
   std::cout << "Saved pidrec png to " << figPng << "\n";

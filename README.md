@@ -107,7 +107,11 @@ Workflow:
 
    These produce the LAD Geant4, HMS SimC, and SHMS SimC ROOT outputs.
 
-6. Merge the accepted SimC events with the corresponding LAD Geant4 events.
+6. After the three simulations finish, run `select_accepted_DIS_dat.C` in the run-local origin output directory.
+
+   The macro reads the local `.dat`, `dis_hms_e.root`, and `dis_shms_e.root`, then writes selected accepted `.dat` files and HMS/SHMS diagnostic PDFs in the same directory.
+
+7. Merge the accepted SimC events with the corresponding LAD Geant4 events.
 
    This is done with:
 

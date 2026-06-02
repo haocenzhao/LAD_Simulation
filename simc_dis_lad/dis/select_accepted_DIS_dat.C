@@ -3,8 +3,8 @@
 //   root -l -b -q select_accepted_DIS_dat.C
 //
 // Function:
-//   1) Read accepted event_id from ../worksim/dis_hms_e.root
-//      and ../worksim/dis_shms_e.root
+//   1) Read accepted event_id from dis_hms_e.root
+//      and dis_shms_e.root
 //   2) Select corresponding events from the original DIS .dat file
 //   3) Write new .dat files with exactly the same original line format
 //   4) Make kinematic plots and save them into two PDF files
@@ -22,7 +22,11 @@
 #include <TCanvas.h>
 #include <TH1F.h>
 #include <TH1D.h>
+#include <TH2.h>
+#include <TH2F.h>
 #include <TH2D.h>
+#include <TPad.h>
+#include <TPaveStats.h>
 #include <TLatex.h>
 #include <TStyle.h>
 #include <TMath.h>
@@ -145,12 +149,30 @@ static void SetCanvasMargin(TCanvas* c, bool hasColorBar = false) {
   c->SetTopMargin(0.08);
 }
 
+static void MoveStatsBox(TH1* h,
+                         double x1,
+                         double y1,
+                         double x2,
+                         double y2,
+                         int color = kBlack) {
+  TPaveStats* stats = (TPaveStats*)h->FindObject("stats");
+  if (!stats) return;
+
+  stats->SetX1NDC(x1);
+  stats->SetY1NDC(y1);
+  stats->SetX2NDC(x2);
+  stats->SetY2NDC(y2);
+  stats->SetTextColor(color);
+  stats->SetLineColor(color);
+}
+
 static void Draw1DToPDF(TH1D* h,
                         const std::string& figPdf,
                         const std::string& canvasName,
                         const std::string& canvasTitle) {
   TCanvas* c = new TCanvas(canvasName.c_str(), canvasTitle.c_str(), 800, 650);
   SetCanvasMargin(c, false);
+  h->SetStats(1);
   h->SetLineWidth(2);
   h->SetFillStyle(0);
   h->Draw("HIST");
@@ -169,10 +191,12 @@ static void DrawOverlay1DToPDF(TH1D* h_dat,
   h_dat->SetLineColor(kBlue);
   h_dat->SetLineWidth(2);
   h_dat->SetFillStyle(0);
+  h_dat->SetStats(1);
 
   h_root->SetLineColor(kRed);
   h_root->SetLineWidth(2);
   h_root->SetFillStyle(0);
+  h_root->SetStats(1);
 
   h_dat->GetXaxis()->SetTitle(xTitle.c_str());
   h_root->GetXaxis()->SetTitle(xTitle.c_str());
@@ -185,9 +209,15 @@ static void DrawOverlay1DToPDF(TH1D* h_dat,
   h_dat->SetMinimum(0.0);
 
   h_dat->Draw("HIST");
-  h_root->Draw("HIST SAME");
+  h_root->Draw("HIST SAMES");
 
-  TLegend* leg = new TLegend(0.55, 0.72, 0.88, 0.88);
+  c->Update();
+  MoveStatsBox(h_dat,  0.55, 0.78, 0.88, 0.90, kBlue);
+  MoveStatsBox(h_root, 0.55, 0.64, 0.88, 0.76, kRed);
+  c->Modified();
+  c->Update();
+
+  TLegend* leg = new TLegend(0.55, 0.50, 0.88, 0.62);
   leg->SetBorderSize(0);
   leg->SetFillStyle(0);
   leg->AddEntry(h_dat,  "calculated from selected dat", "l");
@@ -197,13 +227,18 @@ static void DrawOverlay1DToPDF(TH1D* h_dat,
   c->Print(figPdf.c_str());
 }
 
-static void Draw2DToPDF(TH2D* h,
+static void Draw2DToPDF(TH2* h,
                         const std::string& figPdf,
                         const std::string& canvasName,
                         const std::string& canvasTitle) {
   TCanvas* c = new TCanvas(canvasName.c_str(), canvasTitle.c_str(), 800, 650);
   SetCanvasMargin(c, true);
+  h->SetStats(1);
   h->Draw("COLZ");
+  c->Update();
+  MoveStatsBox(h, 0.15, 0.78, 0.42, 0.90);
+  c->Modified();
+  c->Update();
   c->Print(figPdf.c_str());
 }
 
@@ -240,6 +275,12 @@ static void ProcessOneSpectrometer(const std::string& specName,
   std::map<int, Long64_t> pidCount;
 
   const std::string tag = specName + " accepted";
+  const int electronThetaBins = 40;
+  const double electronThetaMin = 0.0;
+  const double electronThetaMax = 40.0;
+  const int electronPhiBins = 100;
+  const double electronPhiMin = (specName == "HMS") ? -150.0 : 50.0;
+  const double electronPhiMax = (specName == "HMS") ?  -50.0 : 150.0;
 
   // ============================================================
   // Histograms
@@ -268,11 +309,17 @@ static void ProcessOneSpectrometer(const std::string& specName,
       120, 80.0, 200.0,
       100, 0.0, 1000.0);
 
+  TH2F* h_p_vs_phi_rec = new TH2F(
+      Form("h_p_vs_phi_rec_%s", specName.c_str()),
+      Form("%s recoil particle p vs #phi;#phi [deg];p [MeV/c]", tag.c_str()),
+      180, -90.0, 90.0,
+      100, 0.0, 1000.0);
+
   TH2D* h_theta_phi_e = new TH2D(
       Form("h_theta_phi_e_%s", specName.c_str()),
       Form("%s scattered electron #theta-#phi;#phi [deg];#theta [deg]", tag.c_str()),
-      190, -190.0, 190.0,
-      100,   0.0, 200.0);
+      electronPhiBins, electronPhiMin, electronPhiMax,
+      electronThetaBins, electronThetaMin, electronThetaMax);
 
   TH1D* h_p_e = new TH1D(
       Form("h_p_e_%s", specName.c_str()),
@@ -288,7 +335,13 @@ static void ProcessOneSpectrometer(const std::string& specName,
   TH2D* h_p_vs_theta_e = new TH2D(
       Form("h_p_vs_theta_e_%s", specName.c_str()),
       Form("%s scattered electron p vs #theta;#theta [deg];p [MeV/c]", tag.c_str()),
-      85, 0.0, 190.0,
+      electronThetaBins, electronThetaMin, electronThetaMax,
+      100, 0.0, 10000.0);
+
+  TH2F* h_p_vs_phi_e = new TH2F(
+      Form("h_p_vs_phi_e_%s", specName.c_str()),
+      Form("%s scattered electron p vs #phi;#phi [deg];p [MeV/c]", tag.c_str()),
+      electronPhiBins, electronPhiMin, electronPhiMax,
       100, 0.0, 10000.0);
 
   // Q2/q/W calculated from selected dat
@@ -399,6 +452,7 @@ static void ProcessOneSpectrometer(const std::string& specName,
     h_p_rec->Fill(p_rec);
     h_pz_vs_p_rec->Fill(pt_rec, pr2);
     h_p_vs_theta_rec->Fill(theta_rec_deg, p_rec);
+    h_p_vs_phi_rec->Fill(phi_rec_deg, p_rec);
 
     // ==========================================================
     // Scattered-electron kinematics
@@ -422,6 +476,7 @@ static void ProcessOneSpectrometer(const std::string& specName,
     h_p_e->Fill(p_e);
     h_pz_vs_p_e->Fill(pt_e, pe2);
     h_p_vs_theta_e->Fill(theta_e_deg, p_e);
+    h_p_vs_phi_e->Fill(phi_e_deg, p_e);
 
     // ==========================================================
     // Inclusive DIS kinematics calculated from selected dat
@@ -524,6 +579,7 @@ static void ProcessOneSpectrometer(const std::string& specName,
   h_pid->GetYaxis()->SetLabelSize(0.05);
   h_pid->GetXaxis()->SetTitleSize(0.055);
   h_pid->GetYaxis()->SetTitleSize(0.06);
+  h_pid->SetStats(1);
   h_pid->SetLineWidth(2);
   h_pid->SetFillStyle(0);
   h_pid->Draw("HIST");
@@ -564,6 +620,11 @@ static void ProcessOneSpectrometer(const std::string& specName,
               Form("c_p_vs_theta_rec_%s", specName.c_str()),
               Form("%s p_vs_theta_rec", specName.c_str()));
 
+  Draw2DToPDF(h_p_vs_phi_rec,
+              figPdf,
+              Form("c_p_vs_phi_rec_%s", specName.c_str()),
+              Form("%s p_vs_phi_rec", specName.c_str()));
+
   Draw2DToPDF(h_theta_phi_e,
               figPdf,
               Form("c_theta_phi_e_%s", specName.c_str()),
@@ -583,6 +644,11 @@ static void ProcessOneSpectrometer(const std::string& specName,
               figPdf,
               Form("c_p_vs_theta_e_%s", specName.c_str()),
               Form("%s p_vs_theta_e", specName.c_str()));
+
+  Draw2DToPDF(h_p_vs_phi_e,
+              figPdf,
+              Form("c_p_vs_phi_e_%s", specName.c_str()),
+              Form("%s p_vs_phi_e", specName.c_str()));
 
   DrawOverlay1DToPDF(h_Q2,
                      h_Q2_root,
@@ -606,19 +672,27 @@ static void ProcessOneSpectrometer(const std::string& specName,
   h_W->SetLineColor(kBlue);
   h_W->SetLineWidth(2);
   h_W->SetFillStyle(0);
+  h_W->SetStats(1);
 
   h_W_root->SetLineColor(kRed);
   h_W_root->SetLineWidth(2);
   h_W_root->SetFillStyle(0);
+  h_W_root->SetStats(1);
 
   const double ymax_W = std::max(h_W->GetMaximum(), h_W_root->GetMaximum());
   h_W->SetMaximum(ymax_W * 1.20);
   h_W->SetMinimum(0.0);
 
   h_W->Draw("HIST");
-  h_W_root->Draw("HIST SAME");
+  h_W_root->Draw("HIST SAMES");
 
-  TLegend* leg_W = new TLegend(0.55, 0.72, 0.88, 0.88);
+  c_W->Update();
+  MoveStatsBox(h_W,      0.55, 0.78, 0.88, 0.90, kBlue);
+  MoveStatsBox(h_W_root, 0.55, 0.64, 0.88, 0.76, kRed);
+  c_W->Modified();
+  c_W->Update();
+
+  TLegend* leg_W = new TLegend(0.55, 0.50, 0.88, 0.62);
   leg_W->SetBorderSize(0);
   leg_W->SetFillStyle(0);
   leg_W->AddEntry(h_W,      "calculated from selected dat", "l");
@@ -645,8 +719,8 @@ void select_accepted_DIS_dat() {
   const std::string inDatFile =
       "test_band_tagged_full_PRC_E10.2GeV_recp.dat";
 
-  const std::string hmsRootFile  = "../worksim/dis_hms_e.root";
-  const std::string shmsRootFile = "../worksim/dis_shms_e.root";
+  const std::string hmsRootFile  = "dis_hms_e.root";
+  const std::string shmsRootFile = "dis_shms_e.root";
 
   const std::string hmsOutDatFile  = "HMS_10.2GeV_DIS_recp_select.dat";
   const std::string shmsOutDatFile = "SHMS_10.2GeV_DIS_recp_select.dat";
@@ -654,7 +728,7 @@ void select_accepted_DIS_dat() {
   const std::string hmsFigPdf  = "HMS_E10.2GeV.pdf";
   const std::string shmsFigPdf = "SHMS_E10.2GeV.pdf";
 
-  gStyle->SetOptStat(0);
+  gStyle->SetOptStat("em");
 
   ProcessOneSpectrometer("HMS",
                          hmsRootFile,
