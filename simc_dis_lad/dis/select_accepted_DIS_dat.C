@@ -278,9 +278,9 @@ static void ProcessOneSpectrometer(const std::string& specName,
   const int electronThetaBins = 40;
   const double electronThetaMin = 0.0;
   const double electronThetaMax = 40.0;
-  const int electronPhiBins = 100;
-  const double electronPhiMin = (specName == "HMS") ? -150.0 : 50.0;
-  const double electronPhiMax = (specName == "HMS") ?  -50.0 : 150.0;
+  const int electronPhiBins = 360;
+  const double electronPhiMin = (specName == "HMS") ? -180.0 : -180.0;
+  const double electronPhiMax = (specName == "HMS") ?  180.0 : 180.0;
 
   // ============================================================
   // Histograms

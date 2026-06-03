@@ -6,7 +6,7 @@
 ; 5) use doing_phsp = 1 so SIMC does not apply the built-in elastic/eep cross section
 
 begin parm experiment
-  ngen = -460614       ; +N: require N accepted events; -N: process exactly N input events
+  ngen = -100531       ; +N: require N accepted events; -N: process exactly N input events
   EXPER%charge = 1.0
 
   doing_phsp = 1
@@ -18,7 +18,7 @@ begin parm experiment
   doing_dis  = 1
 
   doing_decay = 0
-  dis_datfile = /w/hallc-scshelf2102/c-lad/haocen/LAD_Simulation/Output/origin_output/2026-06-01-06-15-52_460614Events/test_band_tagged_full_PRC_E10.2GeV_recp.dat
+  dis_datfile = /w/hallc-scshelf2102/c-lad/haocen/LAD_Simulation/Output/origin_output/2026-06-03-02-23-35_100531Events/LAD_tagged_full_PRC_E10.2GeV_recp.dat
 
 end parm experiment
 

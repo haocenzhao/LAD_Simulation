@@ -29,6 +29,13 @@ gmake clean
 gmake
 ```
 
+## Direction
+- Coordinate convention: 
+   - Geant4/generator -> x=beam left, y=up, z=beam direction; 
+   - SIMC -> x=down, y=beam left, z=beam direction. 
+     - The SIMC DIS loader already applies the coordinate transform.
+
+
 ## DIS Simulation Workflow
 
 The integrated DIS workflow is controlled by `run_simulation.tcsh`.

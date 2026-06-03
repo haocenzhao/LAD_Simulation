@@ -10,6 +10,9 @@ C    momentum components: MeV/c
 C    zvtx: cm   (relative to target center; targ%zoffset will be added)
 C    weight: arbitrary (user-defined); used as main%gen_weight
 C
+C  Coord: generator/G4 x=left,y=up,z=beam; SIMC x=down,y=left,z=beam;
+C     pz_simc = pz_g4; py_simc = px_g4; px_simc = -py_g4
+C
 C  Output:
 C    fills main%target, vertex (true), orig (=vertex), success
 C=======================================================================
@@ -157,9 +160,10 @@ C===========================================================
       if (peP .le. tiny) goto 10
 
       Ee  = peP
-      uex = pe_px / peP
-      uey = pe_py / peP
-      uez = pe_pz / peP
+C G4/gen x=left,y=up,z=beam; SIMC x=down,y=left,z=beam.
+      uex = -pe_py / peP
+      uey =  pe_px / peP
+      uez =  pe_pz / peP
 
       vertex%e%P = peP
       vertex%e%E = Ee
@@ -183,9 +187,9 @@ C===========================================================
       if (prP .le. tiny) goto 10
 
       Ep  = sqrt(prP*prP + Mp*Mp)
-      upx = pr_px / prP
-      upy = pr_py / prP
-      upz = pr_pz / prP
+      upx = -pr_py / prP
+      upy =  pr_px / prP
+      upz =  pr_pz / prP
 
       vertex%p%P = prP
       vertex%p%E = Ep

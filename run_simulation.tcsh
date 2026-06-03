@@ -3,9 +3,14 @@
 # =========================
 # User settings
 # =========================
-# path to dis root file
-setenv DIS_ROOT_FILE /w/hallc-scshelf2102/c-lad/haocen/Deuteron_DIS/GEMC/generator/10.2/tagged_full/PRC/test_band_tagged_full_PRC_E10.2GeV_recp.root
-# setenv DIS_ROOT_FILE /volatile/hallc/c-lad/ehingerl/GEMC/generator/10.2/tagged_full/PRC/LAD_tagged_full_PRC_E10.2GeV_recp.root
+# path to dis root file{{{
+#full theta, phi, momentum
+# setenv DIS_ROOT_FILE /w/hallc-scshelf2102/c-lad/haocen/Deuteron_DIS/GEMC/generator/10.2/tagged_full/PRC/test_band_tagged_full_PRC_E10.2GeV_recp.root
+
+#theta cut: 13.5 +/- 1 deg
+#momentum cut: 4.4GeV , delta = -10%, +20%
+setenv DIS_ROOT_FILE /volatile/hallc/c-lad/ehingerl/GEMC/generator/10.2/tagged_full/PRC/LAD_tagged_full_PRC_E10.2GeV_recp.root
+#}}}
 
 # num of events: must > 0
 setenv DIS_EVENT_COUNT 2000000
