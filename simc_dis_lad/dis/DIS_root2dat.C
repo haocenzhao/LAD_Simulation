@@ -126,19 +126,19 @@ void DIS_root2dat() {
   TH1D* h_p_rec = new TH1D(
       "h_p_rec",
       "Recoil particle momentum magnitude;p [MeV/c];Counts",
-      100, 0.0, 1000.0);
+      150, 0.0, 1500.0);
 
   TH2D* h_pz_vs_p_rec = new TH2D(
       "h_pz_vs_p_rec",
       "Recoil particle p_{z} vs p_{#perp};p_{#perp} [MeV/c];p_{z} [MeV/c]",
-      110, -100.0, 1000.0,
+      150, 0.0, 1500.0,
       100, -800.0, 800.0);
 
   TH2D* h_p_vs_theta_rec = new TH2D(
       "h_p_vs_theta_rec",
       "Recoil particle p vs #theta;#theta [deg];p [MeV/c]",
       120, 80.0, 200.0,
-      100, 0.0, 1000.0);
+      150, 0.0, 1500.0);
 
   // ------------------------------------------------------------
   // Histograms for scattered electron pe

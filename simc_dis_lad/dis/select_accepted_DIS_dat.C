@@ -279,8 +279,8 @@ static void ProcessOneSpectrometer(const std::string& specName,
   const double electronThetaMin = 0.0;
   const double electronThetaMax = 40.0;
   const int electronPhiBins = 360;
-  const double electronPhiMin = (specName == "HMS") ? -180.0 : -180.0;
-  const double electronPhiMax = (specName == "HMS") ?  180.0 : 180.0;
+  const double electronPhiMin = (specName == "HMS") ? 100.0 : -50.0;
+  const double electronPhiMax = (specName == "HMS") ? 200.0 :  50.0;
 
   // ============================================================
   // Histograms
@@ -295,25 +295,25 @@ static void ProcessOneSpectrometer(const std::string& specName,
   TH1D* h_p_rec = new TH1D(
       Form("h_p_rec_%s", specName.c_str()),
       Form("%s recoil particle momentum magnitude;p [MeV/c];Counts", tag.c_str()),
-      100, 0.0, 1000.0);
+      150, 0.0, 1500.0);
 
   TH2D* h_pz_vs_p_rec = new TH2D(
       Form("h_pz_vs_p_rec_%s", specName.c_str()),
       Form("%s recoil particle p_{z} vs p_{#perp};p_{#perp} [MeV/c];p_{z} [MeV/c]", tag.c_str()),
-      110, 0.0, 1000.0,
+      150, 0.0, 1500.0,
       100, -800.0, 800.0);
 
   TH2D* h_p_vs_theta_rec = new TH2D(
       Form("h_p_vs_theta_rec_%s", specName.c_str()),
       Form("%s recoil particle p vs #theta;#theta [deg];p [MeV/c]", tag.c_str()),
       120, 80.0, 200.0,
-      100, 0.0, 1000.0);
+      150, 0.0, 1500.0);
 
   TH2F* h_p_vs_phi_rec = new TH2F(
       Form("h_p_vs_phi_rec_%s", specName.c_str()),
       Form("%s recoil particle p vs #phi;#phi [deg];p [MeV/c]", tag.c_str()),
       180, -90.0, 90.0,
-      100, 0.0, 1000.0);
+      150, 0.0, 1500.0);
 
   TH2D* h_theta_phi_e = new TH2D(
       Form("h_theta_phi_e_%s", specName.c_str()),
@@ -469,8 +469,12 @@ static void ProcessOneSpectrometer(const std::string& specName,
       theta_e_deg = std::acos(cth) * 180.0 / TMath::Pi();
     }
 
-    const double phi_e_deg =
+    const double phi_e_raw_deg =
         std::atan2(pe1, pe0) * 180.0 / TMath::Pi();
+    const double phi_e_deg =
+        (specName == "HMS" && phi_e_raw_deg < 0.0)
+            ? phi_e_raw_deg + 360.0
+            : phi_e_raw_deg;
 
     h_theta_phi_e->Fill(phi_e_deg, theta_e_deg);
     h_p_e->Fill(p_e);
