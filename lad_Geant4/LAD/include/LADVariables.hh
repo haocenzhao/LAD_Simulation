@@ -29,6 +29,10 @@ public:
   G4double centralWallDistance; // wrt to the center of the hall
   G4double leftWallDistance;  // wrt to the centralWall
   G4double rightWallDistance; // wrt to the centralWallAngle
+
+  G4ThreeVector hodoShift[3][2];   // dx, dy, dz
+  G4ThreeVector hodoRotate[3][2];  // dPitch, dYaw, dRoll
+
   G4bool G4GUI; // G4 terminal or GUI
 
   G4int GeneratorCase;

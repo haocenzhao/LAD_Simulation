@@ -57,6 +57,13 @@ LADVariables::LADVariables()
 	leftWallDistance    =  92 *cm;  // wrt to the centralWall
 	rightWallDistance   =  92 *cm; // wrt to the centralWallAngle
 
+	for (G4int ww = 0; ww < 3; ww++) {
+		for (G4int ws = 0; ws < 2; ws++) {
+			hodoShift[ww][ws] = G4ThreeVector();
+			hodoRotate[ww][ws] = G4ThreeVector();
+		}
+	}
+
 	DISrootFile = "";
 
 }
@@ -93,11 +100,23 @@ LADVariables::LoadFromFile(G4String FileName)
 				READDOUBLE(leftWallAngle, deg); // wrt to the centralWallAngle
 				READDOUBLE(rightWallAngle, deg); // wrt to the centralWallAngle
 
-				READDOUBLE(centralWallDistance, cm); // wrt to the center of the hall
-				READDOUBLE(leftWallDistance, cm);  // wrt to the centralWall
-				READDOUBLE(rightWallDistance, cm); // wrt to the centralWallAngle
+					READDOUBLE(centralWallDistance, cm); // wrt to the center of the hall
+					READDOUBLE(leftWallDistance, cm);  // wrt to the centralWall
+					READDOUBLE(rightWallDistance, cm); // wrt to the centralWallAngle
 
-				READBOOL(G4GUI);//GUI on/off
+					if (buf == "HodoAlign")
+					{
+						G4int wall, layer;
+						G4double dx, dy, dz, dPitch, dYaw, dRoll;
+						if (ss >> wall >> layer >> dx >> dy >> dz >> dPitch >> dYaw >> dRoll) {
+							if (wall >= 0 && wall < 3 && layer >= 0 && layer < 2) {
+								hodoShift[wall][layer] = G4ThreeVector(dx * m, dy * m, dz * m);
+								hodoRotate[wall][layer] = G4ThreeVector(dPitch * deg, dYaw * deg, dRoll * deg);
+							}
+						}
+					}
+
+					READBOOL(G4GUI);//GUI on/off
 
 				READINT(MultiTh);//multithread. DO NOT CHANGE IT!!
 

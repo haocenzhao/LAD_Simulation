@@ -145,27 +145,39 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
       
       G4cout<<"Wall "<<ww<<G4endl;
 
-      for (G4int ws = 0; ws < SubWalls; ws++)
-	{ 
-	  G4cout<<"SubWall "<<ws<<G4endl;
+	      for (G4int ws = 0; ws < SubWalls; ws++)
+			{
+		  G4cout<<"SubWall "<<ws<<G4endl;
 
-	  wallLV[ww+ws+ww]
-	    = new G4LogicalVolume(
-				  wall,                       // its solid
-				  Materials->defaultMaterial, // its material
-				  "SciWall");                 // its name
-	  
-	  wallPV = new G4PVPlacement(G4Transform3D(
-						   rmW[ww+ws+ww],
-						   (G4ThreeVector( vSeparationX[ww], vSeparationY[ww], vSeparationZ[ww]) +
-						    G4ThreeVector( vSpaceX[ww]*ws, vSpaceY[ww]*ws, vSpaceZ[ww]*ws  )
-						    )),
-				     wallLV[ww+ws+ww],               // its logical volume
-				     "SciWall",                      // its name
-				     worldLV,                        // its mother  volumeAluminumThick
-				     false,                          // no boolean operation
-				     ww+ws+ww,                       // copy number
-				     fCheckOverlaps);
+		  G4int panelIndex = ww + ws + ww;
+
+		  wallLV[panelIndex]
+		    = new G4LogicalVolume(
+					  wall,                       // its solid
+					  Materials->defaultMaterial, // its material
+					  "SciWall");                 // its name
+
+		  G4ThreeVector wallPosition =
+		    G4ThreeVector( vSeparationX[ww], vSeparationY[ww], vSeparationZ[ww]) +
+		    G4ThreeVector( vSpaceX[ww]*ws, vSpaceY[ww]*ws, vSpaceZ[ww]*ws ) +
+		    Variables->hodoShift[ww][ws];
+
+		  G4RotationMatrix alignRot;
+		  alignRot.rotateX(Variables->hodoRotate[ww][ws].x());
+		  alignRot.rotateY(Variables->hodoRotate[ww][ws].y());
+		  alignRot.rotateZ(Variables->hodoRotate[ww][ws].z());
+
+		  G4RotationMatrix wallRotation = alignRot * rmW[panelIndex];
+
+		  wallPV = new G4PVPlacement(G4Transform3D(
+							   wallRotation,
+							   wallPosition),
+					     wallLV[panelIndex],               // its logical volume
+					     "SciWall",                      // its name
+					     worldLV,                        // its mother  volumeAluminumThick
+					     false,                          // no boolean operation
+					     panelIndex,                      // copy number
+					     fCheckOverlaps);
 
 	  
 	  // There is something magic calling with the same name each solid and logic
@@ -186,13 +198,13 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
 
         //Need to recall the Kapton box for each Bar
         new G4PVPlacement(nullptr,                                                    // no rotation
-				                G4ThreeVector( ((WallWidth/2 - 2*AluminumThick + KaptonThick - width/2 -0.5*cm)- ((2*AluminumThick + KaptonThick + width/2)*2)*pp),0, 0),   // its position
-				                KaptonLV,                                                   // its logical volume
-				                "KaptonPhy",                                                // its name
-				                wallLV[ww+ws+ww],                                           // its mother volume
-				                false,                                                      // no boolean operation
-				                (ww*10000)+(ws*100)+pp,                                     // copy number (for layers around the bar won´t be necessaery)
-				                fCheckOverlaps);                                            // checking overlaps
+					                G4ThreeVector( ((WallWidth/2 - 2*AluminumThick + KaptonThick - width/2 -0.5*cm)- ((2*AluminumThick + KaptonThick + width/2)*2)*pp),0, 0),   // its position
+					                KaptonLV,                                                   // its logical volume
+					                "KaptonPhy",                                                // its name
+					                wallLV[panelIndex],                                          // its mother volume
+					                false,                                                      // no boolean operation
+					                (ww*10000)+(ws*100)+pp,                                     // copy number (for layers around the bar won´t be necessaery)
+					                fCheckOverlaps);                                            // checking overlaps
 	      //NOTE: with this copy number, each Bar has an unique ID
 
 
