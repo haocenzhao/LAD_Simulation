@@ -347,9 +347,11 @@ void LADDetectorConstructionHodoCreator::BuildMountingPads(G4AssemblyVolume *fra
   const G4double padThickness = 0.75 * inch;
 
   const G4double frameHeight = 216.0 * inch;
-  const G4double frameWidth  = 107.50 * inch;
+  const G4double legInnerClearance = 94.50 * inch;
+  const G4double legOuterX = 4.0 * inch;
+  const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
 
-  const G4double topBottomPadX = 0.5 * (frameWidth - padSize);
+  const G4double topBottomPadX = legCenterX;
   const G4double topBottomPadY = 0.5 * frameHeight - 0.5 * padThickness;
   const G4double padZ = 0.0 * inch;
 
@@ -357,7 +359,6 @@ void LADDetectorConstructionHodoCreator::BuildMountingPads(G4AssemblyVolume *fra
   // outside face of the two vertical legs.  The +/-74.83-inch value is the
   // repeated upper/lower pad station shown from the frame centerline in the
   // Panel 3 view.
-  const G4double legOuterX = 4.0 * inch;
   const G4double sidePadX = topBottomPadX + 0.5 * legOuterX + 0.5 * padThickness;
   const G4double sidePadY = 74.83 * inch;
 
@@ -403,11 +404,10 @@ void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *fra
 {
   // Item 9: VERTICAL LEG, 6 x 4 x .25 wall, ASTM A500 Grade B.
   // Model it as a hollow rectangular tube using a Boolean subtraction.
-  const G4double padSize      = 12.0 * inch;
   const G4double padThickness = 0.75 * inch;
 
   const G4double frameHeight = 216.0 * inch;
-  const G4double frameWidth  = 107.50 * inch;
+  const G4double legInnerClearance = 94.50 * inch;
 
   const G4double legOuterX = 4.0 * inch;
   const G4double legOuterZ = 6.0 * inch;
@@ -440,7 +440,7 @@ void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *fra
                                                "Panel3VerticalLegLV");
   legLV->SetVisAttributes(G4VisAttributes(G4Colour(0.35, 0.35, 0.35)));
 
-  const G4double legCenterX = 0.5 * (frameWidth - padSize);
+  const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
   const G4double legCenterZ = 0.0 * inch;
 
   G4ThreeVector leftLegPosition(-legCenterX, 0.0, legCenterZ);
@@ -460,14 +460,13 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   const G4double tubeWall  = 0.25 * inch;
   const G4double tubeInner = tubeOuter - 2.0 * tubeWall;
 
-  const G4double frameWidth = 107.50 * inch;
-  const G4double padSize    = 12.0 * inch;
   const G4double padThickness = 0.75 * inch;
   const G4double frameHeight = 216.0 * inch;
+  const G4double legInnerClearance = 94.50 * inch;
   const G4double legOuterX  = 4.0 * inch;
   const G4double legOuterZ  = 6.0 * inch;
   const G4double legLength  = frameHeight - 2.0 * padThickness;
-  const G4double legCenterX = 0.5 * (frameWidth - padSize);
+  const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
 
   const G4double tubeLength = 96.0625 * inch; // 96 1/16 from the Panel 3 drawing
   const G4double tubeAngle  = 7.35 * deg;
