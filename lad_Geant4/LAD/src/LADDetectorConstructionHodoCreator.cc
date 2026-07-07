@@ -4,6 +4,7 @@
 #include "LADVariables.hh"
 
 #include "G4VisAttributes.hh"
+#include "G4AssemblyVolume.hh"
 #include "LADMaterials.hh"
 //#include "G4SDManager.hh"
 
@@ -179,6 +180,8 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
 					     panelIndex,                      // copy number
 					     fCheckOverlaps);
 
+          BuildPanel3Frame(worldLV, Materials, panelIndex, wallPosition, wallRotation);
+
 	  
 	  // There is something magic calling with the same name each solid and logic
 	  // volume, although they are different on each loop, without deleting the
@@ -304,6 +307,115 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
 
   //    BarLV->SetVisAttributes(G4VisAttributes(G4VisAttributes::GetInvisible() ));//>SetVisAttributes(G4VisAttributes(G4Colour::Cyan()));
       return;
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *worldLV,
+                                                          LADMaterials *Materials,
+                                                          G4int panelIndex,
+                                                          const G4ThreeVector &hodoCenterHall,
+                                                          const G4RotationMatrix &hodoRotationHall)
+{
+  // Build the frame in its own local coordinate system first.  The origin is the
+  // nominal Panel 3 frame center; later this whole assembly is moved/rotated to
+  // the corrected hodo wall position in hall coordinates.
+  G4AssemblyVolume *frameAssembly = new G4AssemblyVolume();
+
+  BuildMountingPads(frameAssembly, Materials);
+  BuildVerticalLegs(frameAssembly, Materials);
+  BuildDetectorMountTubes(frameAssembly, Materials);
+  BuildGussets(frameAssembly, Materials);
+  BuildChannels(frameAssembly, Materials);
+
+  G4ThreeVector frameCenterHall = hodoCenterHall;
+  G4RotationMatrix *frameRotationHall = new G4RotationMatrix(hodoRotationHall);
+
+  frameAssembly->MakeImprint(worldLV,
+                             frameCenterHall,
+                             frameRotationHall,
+                             160000 + panelIndex * 100,
+                             fCheckOverlaps);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildMountingPads(G4AssemblyVolume *frameAssembly,
+                                                           LADMaterials *Materials)
+{
+  // Item 16: MOUNTING PAD, ASTM A36.  The drawing labels eight pads per frame.
+  const G4double padSize      = 12.0 * inch;
+  const G4double padThickness = 0.75 * inch;
+
+  const G4double frameHeight = 216.0 * inch;
+  const G4double frameWidth  = 107.50 * inch;
+
+  const G4double topBottomPadX = 0.5 * (frameWidth - padSize);
+  const G4double topBottomPadY = 0.5 * frameHeight - 0.5 * padThickness;
+  const G4double padZ = 0.0 * inch;
+
+  // The side pads are the same 12-inch square plates mounted vertically on the
+  // outside of the two vertical legs.  The +/-74.83-inch value is the repeated
+  // upper/lower pad station shown from the frame centerline in the Panel 3 view.
+  const G4double sidePadX = 0.5 * frameWidth - 0.5 * padThickness;
+  const G4double sidePadY = 74.83 * inch;
+
+  G4Box *padSolid = new G4Box("Panel3MountingPadSolid",
+                              padSize / 2.0,
+                              padThickness / 2.0,
+                              padSize / 2.0);
+
+  G4LogicalVolume *padLV = new G4LogicalVolume(padSolid,
+                                               Materials->Steel,
+                                               "Panel3MountingPadLV");
+  padLV->SetVisAttributes(G4VisAttributes(G4Colour(0.45, 0.45, 0.45)));
+
+  G4ThreeVector topBottomPads[4] = {
+    G4ThreeVector(-topBottomPadX, -topBottomPadY, padZ),
+    G4ThreeVector( topBottomPadX, -topBottomPadY, padZ),
+    G4ThreeVector(-topBottomPadX,  topBottomPadY, padZ),
+    G4ThreeVector( topBottomPadX,  topBottomPadY, padZ)
+  };
+
+  for (G4int ii = 0; ii < 4; ii++) {
+    frameAssembly->AddPlacedVolume(padLV, topBottomPads[ii], nullptr);
+  }
+
+  G4RotationMatrix *sidePadRotation = new G4RotationMatrix();
+  sidePadRotation->rotateZ(90.0 * deg);
+
+  G4ThreeVector sidePads[4] = {
+    G4ThreeVector(-sidePadX, -sidePadY, padZ),
+    G4ThreeVector(-sidePadX,  sidePadY, padZ),
+    G4ThreeVector( sidePadX, -sidePadY, padZ),
+    G4ThreeVector( sidePadX,  sidePadY, padZ)
+  };
+
+  for (G4int ii = 0; ii < 4; ii++) {
+    frameAssembly->AddPlacedVolume(padLV, sidePads[ii], sidePadRotation);
+  }
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *,
+                                                           LADMaterials *)
+{
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolume *,
+                                                                 LADMaterials *)
+{
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *,
+                                                      LADMaterials *)
+{
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildChannels(G4AssemblyVolume *,
+                                                       LADMaterials *)
+{
 }
 
 

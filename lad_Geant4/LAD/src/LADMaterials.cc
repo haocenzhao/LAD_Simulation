@@ -25,7 +25,7 @@ LADMaterials::LADMaterials()
   G4Element* O  = new G4Element(name="Oxygen"  ,symbol="O" , z= 8., a=16.00*g/mole);
   G4Element* Si = new G4Element(name="Silicon", symbol="Si" ,z= 14.,a=28.09*g/mole);
   Al = new G4Material(name="Aluminium", z=13., a=26.98*g/mole,  density=2.70*g/cm3);
-  G4Material * Fe = new G4Material(name="Iron",      z=26., a=55.845*g/mole, density=7.87*g/cm3);
+  Steel = new G4Material(name="A36Steel", z=26., a=55.845*g/mole, density=7.85*g/cm3);
 
   G4Material * W = new G4Material(name="Tungsten",    z=74., a=183.84*g/mole, density=19.3*g/cm3);
 

@@ -23,6 +23,7 @@ public:
   G4Material*        liquidArgon;
 
   G4Material * Al;
+  G4Material * Steel;
 
   //From Lucas/Tyler code
   G4Material * H2_gas;

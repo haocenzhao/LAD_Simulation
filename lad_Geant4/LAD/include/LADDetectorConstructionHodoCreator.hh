@@ -21,6 +21,7 @@ using namespace std;
 
 
 class G4VPhysicalVolume;
+class G4AssemblyVolume;
 
 //class LADMaterials;
 
@@ -37,6 +38,16 @@ public:
   static const G4double inch;
 
 private:
+
+  void BuildPanel3Frame(G4LogicalVolume *worldLV, LADMaterials *Materials,
+                        G4int panelIndex,
+                        const G4ThreeVector &hodoCenterHall,
+                        const G4RotationMatrix &hodoRotationHall);
+  void BuildMountingPads(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
+  void BuildVerticalLegs(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
+  void BuildDetectorMountTubes(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
+  void BuildGussets(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
+  void BuildChannels(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
 
   G4double thick;
   G4double width;
