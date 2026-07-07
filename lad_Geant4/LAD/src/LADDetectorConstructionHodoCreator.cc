@@ -460,6 +460,12 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   const G4double tubeWall  = 0.25 * inch;
   const G4double tubeInner = tubeOuter - 2.0 * tubeWall;
 
+  const G4double frameWidth = 107.50 * inch;
+  const G4double padSize    = 12.0 * inch;
+  const G4double legOuterX  = 4.0 * inch;
+  const G4double legOuterZ  = 6.0 * inch;
+  const G4double legCenterX = 0.5 * (frameWidth - padSize);
+
   const G4double tubeLength = 96.0625 * inch; // 96 1/16 from the Panel 3 drawing
   const G4double tubeAngle  = 7.35 * deg;
   const G4double tubeCenterY = 74.83 * inch;
@@ -483,10 +489,68 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
                            nullptr,
                            G4ThreeVector());
 
-  G4LogicalVolume *tubeLV = new G4LogicalVolume(tubeSolid,
-                                                Materials->Steel,
-                                                "Panel3DetectorMountTubeLV");
-  tubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.30, 0.30, 0.30)));
+  // Use the vertical leg's outside envelope as a cutter.  Do not use the hollow
+  // leg solid itself; otherwise the tube material inside the leg's hollow core
+  // would remain.  The cutter is intentionally a little oversized to avoid
+  // coplanar Boolean surfaces.
+  G4Box *legEnvelopeCutter = new G4Box("Panel3DetectorMountTubeLegEnvelopeCutter",
+                                       legOuterX / 2.0 + 0.1 * mm,
+                                       tubeLength,
+                                       legOuterZ / 2.0 + 0.1 * mm);
+
+  G4RotationMatrix *upperCutterRotation = new G4RotationMatrix();
+  upperCutterRotation->rotateZ(-tubeAngle);
+
+  G4ThreeVector upperLeftCutterPosition =
+    (*upperCutterRotation) * G4ThreeVector(-legCenterX, 0.0, 0.0);
+  G4ThreeVector upperRightCutterPosition =
+    (*upperCutterRotation) * G4ThreeVector( legCenterX, 0.0, 0.0);
+
+  G4SubtractionSolid *upperTubeCutLeft =
+    new G4SubtractionSolid("Panel3UpperDetectorMountTubeCutLeft",
+                           tubeSolid,
+                           legEnvelopeCutter,
+                           upperCutterRotation,
+                           upperLeftCutterPosition);
+
+  G4SubtractionSolid *upperTubeSolid =
+    new G4SubtractionSolid("Panel3UpperDetectorMountTubeSolid",
+                           upperTubeCutLeft,
+                           legEnvelopeCutter,
+                           upperCutterRotation,
+                           upperRightCutterPosition);
+
+  G4RotationMatrix *lowerCutterRotation = new G4RotationMatrix();
+  lowerCutterRotation->rotateZ(tubeAngle);
+
+  G4ThreeVector lowerLeftCutterPosition =
+    (*lowerCutterRotation) * G4ThreeVector(-legCenterX, 0.0, 0.0);
+  G4ThreeVector lowerRightCutterPosition =
+    (*lowerCutterRotation) * G4ThreeVector( legCenterX, 0.0, 0.0);
+
+  G4SubtractionSolid *lowerTubeCutLeft =
+    new G4SubtractionSolid("Panel3LowerDetectorMountTubeCutLeft",
+                           tubeSolid,
+                           legEnvelopeCutter,
+                           lowerCutterRotation,
+                           lowerLeftCutterPosition);
+
+  G4SubtractionSolid *lowerTubeSolid =
+    new G4SubtractionSolid("Panel3LowerDetectorMountTubeSolid",
+                           lowerTubeCutLeft,
+                           legEnvelopeCutter,
+                           lowerCutterRotation,
+                           lowerRightCutterPosition);
+
+  G4LogicalVolume *upperTubeLV = new G4LogicalVolume(upperTubeSolid,
+                                                     Materials->Steel,
+                                                     "Panel3UpperDetectorMountTubeLV");
+  upperTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.30, 0.30, 0.30)));
+
+  G4LogicalVolume *lowerTubeLV = new G4LogicalVolume(lowerTubeSolid,
+                                                     Materials->Steel,
+                                                     "Panel3LowerDetectorMountTubeLV");
+  lowerTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.30, 0.30, 0.30)));
 
   G4RotationMatrix *upperTubeRotation = new G4RotationMatrix();
   upperTubeRotation->rotateZ(tubeAngle);
@@ -497,8 +561,8 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   G4ThreeVector upperTubePosition(0.0, tubeCenterY, tubeCenterZ);
   G4ThreeVector lowerTubePosition(0.0, -tubeCenterY, tubeCenterZ);
 
-  frameAssembly->AddPlacedVolume(tubeLV, upperTubePosition, upperTubeRotation);
-  frameAssembly->AddPlacedVolume(tubeLV, lowerTubePosition, lowerTubeRotation);
+  frameAssembly->AddPlacedVolume(upperTubeLV, upperTubePosition, upperTubeRotation);
+  frameAssembly->AddPlacedVolume(lowerTubeLV, lowerTubePosition, lowerTubeRotation);
 }
 
 
