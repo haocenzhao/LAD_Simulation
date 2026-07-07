@@ -441,12 +441,11 @@ void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *fra
   const G4double legCenterX = 0.5 * (frameWidth - padSize);
   const G4double legCenterZ = 0.0 * inch;
 
-  frameAssembly->AddPlacedVolume(legLV,
-                                 G4ThreeVector(-legCenterX, 0.0, legCenterZ),
-                                 nullptr);
-  frameAssembly->AddPlacedVolume(legLV,
-                                 G4ThreeVector( legCenterX, 0.0, legCenterZ),
-                                 nullptr);
+  G4ThreeVector leftLegPosition(-legCenterX, 0.0, legCenterZ);
+  G4ThreeVector rightLegPosition(legCenterX, 0.0, legCenterZ);
+
+  frameAssembly->AddPlacedVolume(legLV, leftLegPosition, nullptr);
+  frameAssembly->AddPlacedVolume(legLV, rightLegPosition, nullptr);
 }
 
 
