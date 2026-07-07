@@ -9,6 +9,8 @@
 #include "LADMaterials.hh"
 //#include "G4SDManager.hh"
 
+#include <cmath>
+
 const G4double LADDetectorConstructionHodoCreator::inch = 25.4 * mm;
 
 
@@ -624,7 +626,8 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
   const G4double gussetInnerY = gussetOuterY - 2.0 * gussetWall;
   const G4double gussetInnerZ = gussetOuterZ - 2.0 * gussetWall;
   const G4double gussetAngle = 45.0 * deg;
-  const G4double halfProjection = 0.5 * gussetLength * cos(gussetAngle);
+  const G4double halfProjection =
+    0.5 * gussetLength * std::cos(gussetAngle);
 
   G4Box *gussetOuterSolid = new G4Box("Panel3GussetOuterSolid",
                                       gussetLength / 2.0,
@@ -658,11 +661,11 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
 
   // Use a second mount-tube envelope as an additional cutter on the side away
   // from the frame center.  The second cutter is shifted along the frame Y
-  // direction, not the tilted tube-local Y direction.  Since the mount tube is
-  // rotated by +/-7.35 deg, the frame-Y shift is scaled by cos(angle) so the
-  // two tilted cutters just touch.
+  // direction, not the tilted tube-local Y direction.  The cutter solids are
+  // slightly oversized, so a nominal 6-inch separation gives a small overlap
+  // instead of an exactly coplanar Boolean boundary.
   const G4double mountTubeSecondCutterNormalSeparation =
-    2.0 * (mountTubeOuter / 2.0 + 0.1 * mm);
+    mountTubeOuter;
 
   auto MakeGussetSolid =
     [&](const G4String &name,
@@ -707,7 +710,7 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                mountTubeCutterTransform);
 
       const G4double secondCutterOffsetFrameY =
-        mountTubeSecondCutterNormalSeparation / cos(mountTubeRotationAngle);
+        mountTubeSecondCutterNormalSeparation / std::cos(mountTubeRotationAngle);
       G4ThreeVector secondCutterOffsetInFrame(
         0.0,
         mountTubeOutwardSign * secondCutterOffsetFrameY,
@@ -730,17 +733,25 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
   G4ThreeVector upperMountTubePosition(0.0, mountTubeCenterY, 0.0);
   G4ThreeVector lowerMountTubePosition(0.0, -mountTubeCenterY, 0.0);
 
-  G4ThreeVector upperLeftGussetPosition(-legCenterX + halfProjection,
-                                        mountTubeCenterY - halfProjection,
+  const G4double legInnerFaceX = legInnerClearance / 2.0;
+  const G4double mountTubeSecondCutterOffsetFrameY =
+    mountTubeSecondCutterNormalSeparation / std::cos(mountTubeAngle);
+  const G4double upperGussetMountEndY =
+    mountTubeCenterY + mountTubeSecondCutterOffsetFrameY;
+  const G4double lowerGussetMountEndY =
+    -mountTubeCenterY - mountTubeSecondCutterOffsetFrameY;
+
+  G4ThreeVector upperLeftGussetPosition(-legInnerFaceX + halfProjection,
+                                        upperGussetMountEndY - halfProjection,
                                         0.0);
-  G4ThreeVector upperRightGussetPosition(legCenterX - halfProjection,
-                                         mountTubeCenterY - halfProjection,
+  G4ThreeVector upperRightGussetPosition(legInnerFaceX - halfProjection,
+                                         upperGussetMountEndY - halfProjection,
                                          0.0);
-  G4ThreeVector lowerLeftGussetPosition(-legCenterX + halfProjection,
-                                        -mountTubeCenterY + halfProjection,
+  G4ThreeVector lowerLeftGussetPosition(-legInnerFaceX + halfProjection,
+                                        lowerGussetMountEndY + halfProjection,
                                         0.0);
-  G4ThreeVector lowerRightGussetPosition(legCenterX - halfProjection,
-                                         -mountTubeCenterY + halfProjection,
+  G4ThreeVector lowerRightGussetPosition(legInnerFaceX - halfProjection,
+                                         lowerGussetMountEndY + halfProjection,
                                          0.0);
 
   G4SubtractionSolid *upperLeftGussetSolid =
