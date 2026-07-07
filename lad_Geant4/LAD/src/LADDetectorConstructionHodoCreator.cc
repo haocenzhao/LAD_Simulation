@@ -502,9 +502,9 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   upperCutterRotation->rotateZ(-tubeAngle);
 
   G4ThreeVector upperLeftCutterPosition =
-    (*upperCutterRotation) * G4ThreeVector(-legCenterX, 0.0, 0.0);
+    (*upperCutterRotation) * G4ThreeVector(-legCenterX, -tubeCenterY, 0.0);
   G4ThreeVector upperRightCutterPosition =
-    (*upperCutterRotation) * G4ThreeVector( legCenterX, 0.0, 0.0);
+    (*upperCutterRotation) * G4ThreeVector( legCenterX, -tubeCenterY, 0.0);
 
   G4SubtractionSolid *upperTubeCutLeft =
     new G4SubtractionSolid("Panel3UpperDetectorMountTubeCutLeft",
@@ -524,9 +524,9 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   lowerCutterRotation->rotateZ(tubeAngle);
 
   G4ThreeVector lowerLeftCutterPosition =
-    (*lowerCutterRotation) * G4ThreeVector(-legCenterX, 0.0, 0.0);
+    (*lowerCutterRotation) * G4ThreeVector(-legCenterX, tubeCenterY, 0.0);
   G4ThreeVector lowerRightCutterPosition =
-    (*lowerCutterRotation) * G4ThreeVector( legCenterX, 0.0, 0.0);
+    (*lowerCutterRotation) * G4ThreeVector( legCenterX, tubeCenterY, 0.0);
 
   G4SubtractionSolid *lowerTubeCutLeft =
     new G4SubtractionSolid("Panel3LowerDetectorMountTubeCutLeft",
