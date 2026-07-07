@@ -656,13 +656,24 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                              mountTubeOuter / 2.0 + 0.1 * mm,
                                              mountTubeOuter / 2.0 + 0.1 * mm);
 
+  // A larger cutter placed on the side of the mount tube away from the frame
+  // center.  This trims gusset ends that protrude beyond the mount tube face
+  // after the simple overlap cut.
+  const G4double mountTubeFarSideCutterY = 80.0 * inch;
+  G4Box *mountTubeFarSideCutter =
+    new G4Box("Panel3GussetMountTubeFarSideCutter",
+              mountTubeLength / 2.0 + 10.0 * inch,
+              mountTubeFarSideCutterY / 2.0,
+              mountTubeOuter / 2.0 + 10.0 * inch);
+
   auto MakeGussetSolid =
     [&](const G4String &name,
         const G4ThreeVector &gussetPosition,
         G4double gussetRotationAngle,
         const G4ThreeVector &legPosition,
         const G4ThreeVector &mountTubePosition,
-        G4double mountTubeRotationAngle) -> G4SubtractionSolid *
+        G4double mountTubeRotationAngle,
+        G4double mountTubeFarSideSign) -> G4SubtractionSolid *
     {
       G4RotationMatrix gussetRotation;
       gussetRotation.rotateZ(gussetRotationAngle);
@@ -691,10 +702,29 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
       G4Transform3D mountTubeCutterTransform(mountTubeCutterRotation,
                                              mountTubeCutterPosition);
 
+      G4SubtractionSolid *gussetCutMountTube =
+        new G4SubtractionSolid(name + "CutMountTube",
+                               gussetCutLeg,
+                               mountTubeEnvelopeCutter,
+                               mountTubeCutterTransform);
+
+      G4ThreeVector farSideOffsetInMountTube(
+        0.0,
+        mountTubeFarSideSign * (0.5 * mountTubeOuter
+                                + 0.5 * mountTubeFarSideCutterY),
+        0.0);
+      G4ThreeVector mountTubeFarSideCutterPosition =
+        inverseGussetRotation *
+        (mountTubePosition + mountTubeRotation * farSideOffsetInMountTube
+         - gussetPosition);
+      G4Transform3D mountTubeFarSideCutterTransform(
+        mountTubeCutterRotation,
+        mountTubeFarSideCutterPosition);
+
       return new G4SubtractionSolid(name + "Solid",
-                                    gussetCutLeg,
-                                    mountTubeEnvelopeCutter,
-                                    mountTubeCutterTransform);
+                                    gussetCutMountTube,
+                                    mountTubeFarSideCutter,
+                                    mountTubeFarSideCutterTransform);
     };
 
   G4ThreeVector leftLegPosition(-legCenterX, 0.0, 0.0);
@@ -721,7 +751,8 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                     gussetAngle,
                     leftLegPosition,
                     upperMountTubePosition,
-                    mountTubeAngle);
+                    mountTubeAngle,
+                    1.0);
 
   G4SubtractionSolid *upperRightGussetSolid =
     MakeGussetSolid("Panel3Item13UpperRightGusset",
@@ -729,7 +760,8 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                     -gussetAngle,
                     rightLegPosition,
                     upperMountTubePosition,
-                    mountTubeAngle);
+                    mountTubeAngle,
+                    1.0);
 
   G4SubtractionSolid *lowerLeftGussetSolid =
     MakeGussetSolid("Panel3Item12LowerLeftGusset",
@@ -737,7 +769,8 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                     -gussetAngle,
                     leftLegPosition,
                     lowerMountTubePosition,
-                    -mountTubeAngle);
+                    -mountTubeAngle,
+                    -1.0);
 
   G4SubtractionSolid *lowerRightGussetSolid =
     MakeGussetSolid("Panel3Item13LowerRightGusset",
@@ -745,7 +778,8 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                     gussetAngle,
                     rightLegPosition,
                     lowerMountTubePosition,
-                    -mountTubeAngle);
+                    -mountTubeAngle,
+                    -1.0);
 
   G4LogicalVolume *upperLeftGussetLV =
     new G4LogicalVolume(upperLeftGussetSolid,
