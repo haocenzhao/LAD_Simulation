@@ -656,15 +656,11 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                              mountTubeOuter / 2.0 + 0.1 * mm,
                                              mountTubeOuter / 2.0 + 0.1 * mm);
 
-  // A larger cutter placed on the side of the mount tube away from the frame
-  // center.  This trims gusset ends that protrude beyond the mount tube face
-  // after the simple overlap cut.
-  const G4double mountTubeFarSideCutterY = 80.0 * inch;
-  G4Box *mountTubeFarSideCutter =
-    new G4Box("Panel3GussetMountTubeFarSideCutter",
-              mountTubeLength / 2.0 + 10.0 * inch,
-              mountTubeFarSideCutterY / 2.0,
-              mountTubeOuter / 2.0 + 10.0 * inch);
+  // Use a second mount-tube envelope as an additional cutter on the side away
+  // from the frame center.  It is shifted by one cutter width, so the two
+  // mount-tube cutters just touch instead of overlapping.
+  const G4double mountTubeSecondCutterOffsetY =
+    2.0 * (mountTubeOuter / 2.0 + 0.1 * mm);
 
   auto MakeGussetSolid =
     [&](const G4String &name,
@@ -673,7 +669,7 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
         const G4ThreeVector &legPosition,
         const G4ThreeVector &mountTubePosition,
         G4double mountTubeRotationAngle,
-        G4double mountTubeFarSideSign) -> G4SubtractionSolid *
+        G4double mountTubeOutwardSign) -> G4SubtractionSolid *
     {
       G4RotationMatrix gussetRotation;
       gussetRotation.rotateZ(gussetRotationAngle);
@@ -708,23 +704,22 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                mountTubeEnvelopeCutter,
                                mountTubeCutterTransform);
 
-      G4ThreeVector farSideOffsetInMountTube(
+      G4ThreeVector secondCutterOffsetInMountTube(
         0.0,
-        mountTubeFarSideSign * (0.5 * mountTubeOuter
-                                + 0.5 * mountTubeFarSideCutterY),
+        mountTubeOutwardSign * mountTubeSecondCutterOffsetY,
         0.0);
-      G4ThreeVector mountTubeFarSideCutterPosition =
+      G4ThreeVector secondMountTubeCutterPosition =
         inverseGussetRotation *
-        (mountTubePosition + mountTubeRotation * farSideOffsetInMountTube
+        (mountTubePosition + mountTubeRotation * secondCutterOffsetInMountTube
          - gussetPosition);
-      G4Transform3D mountTubeFarSideCutterTransform(
+      G4Transform3D secondMountTubeCutterTransform(
         mountTubeCutterRotation,
-        mountTubeFarSideCutterPosition);
+        secondMountTubeCutterPosition);
 
       return new G4SubtractionSolid(name + "Solid",
                                     gussetCutMountTube,
-                                    mountTubeFarSideCutter,
-                                    mountTubeFarSideCutterTransform);
+                                    mountTubeEnvelopeCutter,
+                                    secondMountTubeCutterTransform);
     };
 
   G4ThreeVector leftLegPosition(-legCenterX, 0.0, 0.0);
