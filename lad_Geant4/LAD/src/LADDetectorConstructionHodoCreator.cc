@@ -354,9 +354,11 @@ void LADDetectorConstructionHodoCreator::BuildMountingPads(G4AssemblyVolume *fra
   const G4double padZ = 0.0 * inch;
 
   // The side pads are the same 12-inch square plates mounted vertically on the
-  // outside of the two vertical legs.  The +/-74.83-inch value is the repeated
-  // upper/lower pad station shown from the frame centerline in the Panel 3 view.
-  const G4double sidePadX = 0.5 * frameWidth - 0.5 * padThickness;
+  // outside face of the two vertical legs.  The +/-74.83-inch value is the
+  // repeated upper/lower pad station shown from the frame centerline in the
+  // Panel 3 view.
+  const G4double legOuterX = 4.0 * inch;
+  const G4double sidePadX = topBottomPadX + 0.5 * legOuterX + 0.5 * padThickness;
   const G4double sidePadY = 74.83 * inch;
 
   G4Box *padSolid = new G4Box("Panel3MountingPadSolid",
