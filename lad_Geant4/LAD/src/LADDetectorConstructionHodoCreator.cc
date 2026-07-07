@@ -318,8 +318,8 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
                                                           const G4RotationMatrix &hodoRotationHall)
 {
   // Build the frame in its own local coordinate system first.  The origin is the
-  // nominal Panel 3 frame center; later this whole assembly is moved/rotated to
-  // the corrected hodo wall position in hall coordinates.
+  // nominal Panel 3 frame center; later this whole assembly is moved/rotated
+  // relative to the corrected hodo wall position in hall coordinates.
   G4AssemblyVolume *frameAssembly = new G4AssemblyVolume();
 
   BuildMountingPads(frameAssembly, Materials);
@@ -328,7 +328,26 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
   BuildGussets(frameAssembly, Materials);
   BuildChannels(frameAssembly, Materials);
 
-  G4ThreeVector frameCenterHall = hodoCenterHall;
+  // The hodo wall rests against Panel 3; their centers should therefore differ
+  // along the local wall-normal direction.  This first approximation is kept as
+  // explicit variables because the item-8/channel interface will be refined
+  // later:
+  //
+  //   center spacing = 1/2 * (hodo wall thickness + mount tube width)
+  //                  + item-8 channel width
+  //
+  // Local Z is the hodo-wall thickness direction in the current wall geometry.
+  // Flip the sign of panel3FrameOffsetZ if visualization shows the frame on the
+  // wrong side of the hodo wall.
+  const G4double hodoWallThickness = WallThick;
+  const G4double mountTubeWidth = 6.0 * inch;
+  const G4double item8ChannelWidth = 1.625 * inch; // Unistrut P1000 nominal width
+  const G4double panel3FrameOffsetZ =
+    0.5 * (hodoWallThickness + mountTubeWidth) + item8ChannelWidth;
+
+  G4ThreeVector frameOffsetLocal(0.0, 0.0, panel3FrameOffsetZ);
+  G4ThreeVector frameCenterHall =
+    hodoCenterHall + hodoRotationHall * frameOffsetLocal;
   G4RotationMatrix *frameRotationHall = new G4RotationMatrix(hodoRotationHall);
 
   frameAssembly->MakeImprint(worldLV,
@@ -578,9 +597,202 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
 }
 
 
-void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *,
-                                                      LADMaterials *)
+void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAssembly,
+                                                      LADMaterials *Materials)
 {
+  // Items 12 and 13: PANEL 3, FRAME GUSSET-1/2, 6 x 4 x .25 wall,
+  // ASTM A500 Grade B.  The four diagonal gussets are 40-inch tubes at +/-45 deg.
+  // Left pair: item 12.  Right pair: item 13.
+  const G4double padThickness = 0.75 * inch;
+  const G4double frameHeight = 216.0 * inch;
+  const G4double legInnerClearance = 94.50 * inch;
+
+  const G4double legOuterX = 4.0 * inch;
+  const G4double legOuterZ = 6.0 * inch;
+  const G4double legLength = frameHeight - 2.0 * padThickness;
+  const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
+
+  const G4double mountTubeOuter = 6.0 * inch;
+  const G4double mountTubeLength = 96.0625 * inch;
+  const G4double mountTubeAngle = 7.35 * deg;
+  const G4double mountTubeCenterY = 74.83 * inch;
+
+  const G4double gussetLength = 40.0 * inch;
+  const G4double gussetOuterY = 6.0 * inch;
+  const G4double gussetOuterZ = 4.0 * inch;
+  const G4double gussetWall = 0.25 * inch;
+  const G4double gussetInnerY = gussetOuterY - 2.0 * gussetWall;
+  const G4double gussetInnerZ = gussetOuterZ - 2.0 * gussetWall;
+  const G4double gussetAngle = 45.0 * deg;
+  const G4double halfProjection = 0.5 * gussetLength * cos(gussetAngle);
+
+  G4Box *gussetOuterSolid = new G4Box("Panel3GussetOuterSolid",
+                                      gussetLength / 2.0,
+                                      gussetOuterY / 2.0,
+                                      gussetOuterZ / 2.0);
+
+  // Make the cutter slightly longer than the tube to avoid coplanar Boolean faces.
+  G4Box *gussetInnerSolid = new G4Box("Panel3GussetInnerSolid",
+                                      gussetLength / 2.0 + 0.1 * mm,
+                                      gussetInnerY / 2.0,
+                                      gussetInnerZ / 2.0);
+
+  G4SubtractionSolid *gussetHollowSolid =
+    new G4SubtractionSolid("Panel3GussetHollowSolid",
+                           gussetOuterSolid,
+                           gussetInnerSolid,
+                           nullptr,
+                           G4ThreeVector());
+
+  // Use solid envelopes as cutters so the gussets do not overlap the vertical
+  // legs or detector mount tubes.  The real weld/miter details are simplified.
+  G4Box *legEnvelopeCutter = new G4Box("Panel3GussetLegEnvelopeCutter",
+                                       legOuterX / 2.0 + 0.1 * mm,
+                                       legLength / 2.0 + 0.1 * mm,
+                                       legOuterZ / 2.0 + 0.1 * mm);
+
+  G4Box *mountTubeEnvelopeCutter = new G4Box("Panel3GussetMountTubeEnvelopeCutter",
+                                             mountTubeLength / 2.0 + 0.1 * mm,
+                                             mountTubeOuter / 2.0 + 0.1 * mm,
+                                             mountTubeOuter / 2.0 + 0.1 * mm);
+
+  auto MakeGussetSolid =
+    [&](const G4String &name,
+        const G4ThreeVector &gussetPosition,
+        G4double gussetRotationAngle,
+        const G4ThreeVector &legPosition,
+        const G4ThreeVector &mountTubePosition,
+        G4double mountTubeRotationAngle) -> G4SubtractionSolid *
+    {
+      G4RotationMatrix gussetRotation;
+      gussetRotation.rotateZ(gussetRotationAngle);
+
+      G4RotationMatrix inverseGussetRotation(gussetRotation);
+      inverseGussetRotation.invert();
+
+      G4RotationMatrix legCutterRotation(inverseGussetRotation);
+      G4ThreeVector legCutterPosition =
+        inverseGussetRotation * (legPosition - gussetPosition);
+      G4Transform3D legCutterTransform(legCutterRotation,
+                                       legCutterPosition);
+
+      G4SubtractionSolid *gussetCutLeg =
+        new G4SubtractionSolid(name + "CutLeg",
+                               gussetHollowSolid,
+                               legEnvelopeCutter,
+                               legCutterTransform);
+
+      G4RotationMatrix mountTubeRotation;
+      mountTubeRotation.rotateZ(mountTubeRotationAngle);
+      G4RotationMatrix mountTubeCutterRotation =
+        inverseGussetRotation * mountTubeRotation;
+      G4ThreeVector mountTubeCutterPosition =
+        inverseGussetRotation * (mountTubePosition - gussetPosition);
+      G4Transform3D mountTubeCutterTransform(mountTubeCutterRotation,
+                                             mountTubeCutterPosition);
+
+      return new G4SubtractionSolid(name + "Solid",
+                                    gussetCutLeg,
+                                    mountTubeEnvelopeCutter,
+                                    mountTubeCutterTransform);
+    };
+
+  G4ThreeVector leftLegPosition(-legCenterX, 0.0, 0.0);
+  G4ThreeVector rightLegPosition(legCenterX, 0.0, 0.0);
+  G4ThreeVector upperMountTubePosition(0.0, mountTubeCenterY, 0.0);
+  G4ThreeVector lowerMountTubePosition(0.0, -mountTubeCenterY, 0.0);
+
+  G4ThreeVector upperLeftGussetPosition(-legCenterX + halfProjection,
+                                        mountTubeCenterY - halfProjection,
+                                        0.0);
+  G4ThreeVector upperRightGussetPosition(legCenterX - halfProjection,
+                                         mountTubeCenterY - halfProjection,
+                                         0.0);
+  G4ThreeVector lowerLeftGussetPosition(-legCenterX + halfProjection,
+                                        -mountTubeCenterY + halfProjection,
+                                        0.0);
+  G4ThreeVector lowerRightGussetPosition(legCenterX - halfProjection,
+                                         -mountTubeCenterY + halfProjection,
+                                         0.0);
+
+  G4SubtractionSolid *upperLeftGussetSolid =
+    MakeGussetSolid("Panel3Item12UpperLeftGusset",
+                    upperLeftGussetPosition,
+                    gussetAngle,
+                    leftLegPosition,
+                    upperMountTubePosition,
+                    mountTubeAngle);
+
+  G4SubtractionSolid *upperRightGussetSolid =
+    MakeGussetSolid("Panel3Item13UpperRightGusset",
+                    upperRightGussetPosition,
+                    -gussetAngle,
+                    rightLegPosition,
+                    upperMountTubePosition,
+                    mountTubeAngle);
+
+  G4SubtractionSolid *lowerLeftGussetSolid =
+    MakeGussetSolid("Panel3Item12LowerLeftGusset",
+                    lowerLeftGussetPosition,
+                    -gussetAngle,
+                    leftLegPosition,
+                    lowerMountTubePosition,
+                    -mountTubeAngle);
+
+  G4SubtractionSolid *lowerRightGussetSolid =
+    MakeGussetSolid("Panel3Item13LowerRightGusset",
+                    lowerRightGussetPosition,
+                    gussetAngle,
+                    rightLegPosition,
+                    lowerMountTubePosition,
+                    -mountTubeAngle);
+
+  G4LogicalVolume *upperLeftGussetLV =
+    new G4LogicalVolume(upperLeftGussetSolid,
+                        Materials->Steel,
+                        "Panel3Item12UpperLeftGussetLV");
+  G4LogicalVolume *upperRightGussetLV =
+    new G4LogicalVolume(upperRightGussetSolid,
+                        Materials->Steel,
+                        "Panel3Item13UpperRightGussetLV");
+  G4LogicalVolume *lowerLeftGussetLV =
+    new G4LogicalVolume(lowerLeftGussetSolid,
+                        Materials->Steel,
+                        "Panel3Item12LowerLeftGussetLV");
+  G4LogicalVolume *lowerRightGussetLV =
+    new G4LogicalVolume(lowerRightGussetSolid,
+                        Materials->Steel,
+                        "Panel3Item13LowerRightGussetLV");
+
+  upperLeftGussetLV->SetVisAttributes(G4VisAttributes(G4Colour(0.25, 0.25, 0.25)));
+  upperRightGussetLV->SetVisAttributes(G4VisAttributes(G4Colour(0.25, 0.25, 0.25)));
+  lowerLeftGussetLV->SetVisAttributes(G4VisAttributes(G4Colour(0.25, 0.25, 0.25)));
+  lowerRightGussetLV->SetVisAttributes(G4VisAttributes(G4Colour(0.25, 0.25, 0.25)));
+
+  G4RotationMatrix *upperLeftGussetRotation = new G4RotationMatrix();
+  upperLeftGussetRotation->rotateZ(gussetAngle);
+
+  G4RotationMatrix *upperRightGussetRotation = new G4RotationMatrix();
+  upperRightGussetRotation->rotateZ(-gussetAngle);
+
+  G4RotationMatrix *lowerLeftGussetRotation = new G4RotationMatrix();
+  lowerLeftGussetRotation->rotateZ(-gussetAngle);
+
+  G4RotationMatrix *lowerRightGussetRotation = new G4RotationMatrix();
+  lowerRightGussetRotation->rotateZ(gussetAngle);
+
+  frameAssembly->AddPlacedVolume(upperLeftGussetLV,
+                                 upperLeftGussetPosition,
+                                 upperLeftGussetRotation);
+  frameAssembly->AddPlacedVolume(upperRightGussetLV,
+                                 upperRightGussetPosition,
+                                 upperRightGussetRotation);
+  frameAssembly->AddPlacedVolume(lowerLeftGussetLV,
+                                 lowerLeftGussetPosition,
+                                 lowerLeftGussetRotation);
+  frameAssembly->AddPlacedVolume(lowerRightGussetLV,
+                                 lowerRightGussetPosition,
+                                 lowerRightGussetRotation);
 }
 
 
