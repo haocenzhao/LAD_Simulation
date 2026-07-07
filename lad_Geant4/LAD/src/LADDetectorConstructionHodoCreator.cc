@@ -5,6 +5,7 @@
 
 #include "G4VisAttributes.hh"
 #include "G4AssemblyVolume.hh"
+#include "G4SubtractionSolid.hh"
 #include "LADMaterials.hh"
 //#include "G4SDManager.hh"
 
@@ -395,9 +396,57 @@ void LADDetectorConstructionHodoCreator::BuildMountingPads(G4AssemblyVolume *fra
 }
 
 
-void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *,
-                                                           LADMaterials *)
+void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *frameAssembly,
+                                                           LADMaterials *Materials)
 {
+  // Item 9: VERTICAL LEG, 6 x 4 x .25 wall, ASTM A500 Grade B.
+  // Model it as a hollow rectangular tube using a Boolean subtraction.
+  const G4double padSize      = 12.0 * inch;
+  const G4double padThickness = 0.75 * inch;
+
+  const G4double frameHeight = 216.0 * inch;
+  const G4double frameWidth  = 107.50 * inch;
+
+  const G4double legOuterX = 4.0 * inch;
+  const G4double legOuterZ = 6.0 * inch;
+  const G4double legWall   = 0.25 * inch;
+  const G4double legLength = frameHeight - 2.0 * padThickness;
+
+  const G4double legInnerX = legOuterX - 2.0 * legWall;
+  const G4double legInnerZ = legOuterZ - 2.0 * legWall;
+
+  G4Box *legOuterSolid = new G4Box("Panel3VerticalLegOuterSolid",
+                                   legOuterX / 2.0,
+                                   legLength / 2.0,
+                                   legOuterZ / 2.0);
+
+  // Make the cutter slightly longer than the tube to avoid coplanar Boolean faces.
+  G4Box *legInnerSolid = new G4Box("Panel3VerticalLegInnerSolid",
+                                   legInnerX / 2.0,
+                                   legLength / 2.0 + 0.1 * mm,
+                                   legInnerZ / 2.0);
+
+  G4SubtractionSolid *legSolid =
+    new G4SubtractionSolid("Panel3VerticalLegSolid",
+                           legOuterSolid,
+                           legInnerSolid,
+                           nullptr,
+                           G4ThreeVector());
+
+  G4LogicalVolume *legLV = new G4LogicalVolume(legSolid,
+                                               Materials->Steel,
+                                               "Panel3VerticalLegLV");
+  legLV->SetVisAttributes(G4VisAttributes(G4Colour(0.35, 0.35, 0.35)));
+
+  const G4double legCenterX = 0.5 * (frameWidth - padSize);
+  const G4double legCenterZ = 0.0 * inch;
+
+  frameAssembly->AddPlacedVolume(legLV,
+                                 G4ThreeVector(-legCenterX, 0.0, legCenterZ),
+                                 nullptr);
+  frameAssembly->AddPlacedVolume(legLV,
+                                 G4ThreeVector( legCenterX, 0.0, legCenterZ),
+                                 nullptr);
 }
 
 
