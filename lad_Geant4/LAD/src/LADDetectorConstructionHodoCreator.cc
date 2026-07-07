@@ -451,9 +451,54 @@ void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *fra
 }
 
 
-void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolume *,
-                                                                 LADMaterials *)
+void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolume *frameAssembly,
+                                                                 LADMaterials *Materials)
 {
+  // Item 10: PANEL 3, DETECTOR MOUNT TUBE, 6 x 6 x .25 wall,
+  // ASTM A500 Grade B.  There are two slanted tubes per Panel 3 frame.
+  const G4double tubeOuter = 6.0 * inch;
+  const G4double tubeWall  = 0.25 * inch;
+  const G4double tubeInner = tubeOuter - 2.0 * tubeWall;
+
+  const G4double tubeLength = 96.0625 * inch; // 96 1/16 from the Panel 3 drawing
+  const G4double tubeAngle  = 7.35 * deg;
+  const G4double tubeCenterY = 74.83 * inch;
+  const G4double tubeCenterZ = 0.0 * inch;
+
+  G4Box *tubeOuterSolid = new G4Box("Panel3DetectorMountTubeOuterSolid",
+                                    tubeLength / 2.0,
+                                    tubeOuter / 2.0,
+                                    tubeOuter / 2.0);
+
+  // Make the cutter slightly longer than the tube to avoid coplanar Boolean faces.
+  G4Box *tubeInnerSolid = new G4Box("Panel3DetectorMountTubeInnerSolid",
+                                    tubeLength / 2.0 + 0.1 * mm,
+                                    tubeInner / 2.0,
+                                    tubeInner / 2.0);
+
+  G4SubtractionSolid *tubeSolid =
+    new G4SubtractionSolid("Panel3DetectorMountTubeSolid",
+                           tubeOuterSolid,
+                           tubeInnerSolid,
+                           nullptr,
+                           G4ThreeVector());
+
+  G4LogicalVolume *tubeLV = new G4LogicalVolume(tubeSolid,
+                                                Materials->Steel,
+                                                "Panel3DetectorMountTubeLV");
+  tubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.30, 0.30, 0.30)));
+
+  G4RotationMatrix *upperTubeRotation = new G4RotationMatrix();
+  upperTubeRotation->rotateZ(tubeAngle);
+
+  G4RotationMatrix *lowerTubeRotation = new G4RotationMatrix();
+  lowerTubeRotation->rotateZ(-tubeAngle);
+
+  G4ThreeVector upperTubePosition(0.0, tubeCenterY, tubeCenterZ);
+  G4ThreeVector lowerTubePosition(0.0, -tubeCenterY, tubeCenterZ);
+
+  frameAssembly->AddPlacedVolume(tubeLV, upperTubePosition, upperTubeRotation);
+  frameAssembly->AddPlacedVolume(tubeLV, lowerTubePosition, lowerTubeRotation);
 }
 
 
