@@ -657,9 +657,11 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                              mountTubeOuter / 2.0 + 0.1 * mm);
 
   // Use a second mount-tube envelope as an additional cutter on the side away
-  // from the frame center.  It is shifted by one cutter width, so the two
-  // mount-tube cutters just touch instead of overlapping.
-  const G4double mountTubeSecondCutterOffsetY =
+  // from the frame center.  The second cutter is shifted along the frame Y
+  // direction, not the tilted tube-local Y direction.  Since the mount tube is
+  // rotated by +/-7.35 deg, the frame-Y shift is scaled by cos(angle) so the
+  // two tilted cutters just touch.
+  const G4double mountTubeSecondCutterNormalSeparation =
     2.0 * (mountTubeOuter / 2.0 + 0.1 * mm);
 
   auto MakeGussetSolid =
@@ -704,14 +706,15 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                mountTubeEnvelopeCutter,
                                mountTubeCutterTransform);
 
-      G4ThreeVector secondCutterOffsetInMountTube(
+      const G4double secondCutterOffsetFrameY =
+        mountTubeSecondCutterNormalSeparation / cos(mountTubeRotationAngle);
+      G4ThreeVector secondCutterOffsetInFrame(
         0.0,
-        mountTubeOutwardSign * mountTubeSecondCutterOffsetY,
+        mountTubeOutwardSign * secondCutterOffsetFrameY,
         0.0);
       G4ThreeVector secondMountTubeCutterPosition =
         inverseGussetRotation *
-        (mountTubePosition + mountTubeRotation * secondCutterOffsetInMountTube
-         - gussetPosition);
+        (mountTubePosition + secondCutterOffsetInFrame - gussetPosition);
       G4Transform3D secondMountTubeCutterTransform(
         mountTubeCutterRotation,
         secondMountTubeCutterPosition);
