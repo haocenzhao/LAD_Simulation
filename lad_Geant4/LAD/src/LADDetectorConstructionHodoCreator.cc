@@ -462,8 +462,11 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
 
   const G4double frameWidth = 107.50 * inch;
   const G4double padSize    = 12.0 * inch;
+  const G4double padThickness = 0.75 * inch;
+  const G4double frameHeight = 216.0 * inch;
   const G4double legOuterX  = 4.0 * inch;
   const G4double legOuterZ  = 6.0 * inch;
+  const G4double legLength  = frameHeight - 2.0 * padThickness;
   const G4double legCenterX = 0.5 * (frameWidth - padSize);
 
   const G4double tubeLength = 96.0625 * inch; // 96 1/16 from the Panel 3 drawing
@@ -495,52 +498,62 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   // coplanar Boolean surfaces.
   G4Box *legEnvelopeCutter = new G4Box("Panel3DetectorMountTubeLegEnvelopeCutter",
                                        legOuterX / 2.0 + 0.1 * mm,
-                                       tubeLength,
+                                       legLength / 2.0 + 0.1 * mm,
                                        legOuterZ / 2.0 + 0.1 * mm);
 
-  G4RotationMatrix *upperCutterRotation = new G4RotationMatrix();
-  upperCutterRotation->rotateZ(-tubeAngle);
+  // Boolean transform of the leg cutter relative to the tube:
+  //   cutter_in_tube = inverse(tube_in_frame) * leg_in_frame
+  // In frame coordinates the vertical legs are not rotated, while the upper
+  // and lower tubes are rotated by +/-tubeAngle around Z.
+  G4RotationMatrix upperCutterRotation;
+  upperCutterRotation.rotateZ(-tubeAngle);
 
   G4ThreeVector upperLeftCutterPosition =
-    (*upperCutterRotation) * G4ThreeVector(-legCenterX, -tubeCenterY, 0.0);
+    upperCutterRotation * G4ThreeVector(-legCenterX, -tubeCenterY, 0.0);
   G4ThreeVector upperRightCutterPosition =
-    (*upperCutterRotation) * G4ThreeVector( legCenterX, -tubeCenterY, 0.0);
+    upperCutterRotation * G4ThreeVector( legCenterX, -tubeCenterY, 0.0);
+
+  G4Transform3D upperLeftCutterTransform(upperCutterRotation,
+                                         upperLeftCutterPosition);
+  G4Transform3D upperRightCutterTransform(upperCutterRotation,
+                                          upperRightCutterPosition);
 
   G4SubtractionSolid *upperTubeCutLeft =
     new G4SubtractionSolid("Panel3UpperDetectorMountTubeCutLeft",
                            tubeSolid,
                            legEnvelopeCutter,
-                           upperCutterRotation,
-                           upperLeftCutterPosition);
+                           upperLeftCutterTransform);
 
   G4SubtractionSolid *upperTubeSolid =
     new G4SubtractionSolid("Panel3UpperDetectorMountTubeSolid",
                            upperTubeCutLeft,
                            legEnvelopeCutter,
-                           upperCutterRotation,
-                           upperRightCutterPosition);
+                           upperRightCutterTransform);
 
-  G4RotationMatrix *lowerCutterRotation = new G4RotationMatrix();
-  lowerCutterRotation->rotateZ(tubeAngle);
+  G4RotationMatrix lowerCutterRotation;
+  lowerCutterRotation.rotateZ(tubeAngle);
 
   G4ThreeVector lowerLeftCutterPosition =
-    (*lowerCutterRotation) * G4ThreeVector(-legCenterX, tubeCenterY, 0.0);
+    lowerCutterRotation * G4ThreeVector(-legCenterX, tubeCenterY, 0.0);
   G4ThreeVector lowerRightCutterPosition =
-    (*lowerCutterRotation) * G4ThreeVector( legCenterX, tubeCenterY, 0.0);
+    lowerCutterRotation * G4ThreeVector( legCenterX, tubeCenterY, 0.0);
+
+  G4Transform3D lowerLeftCutterTransform(lowerCutterRotation,
+                                         lowerLeftCutterPosition);
+  G4Transform3D lowerRightCutterTransform(lowerCutterRotation,
+                                          lowerRightCutterPosition);
 
   G4SubtractionSolid *lowerTubeCutLeft =
     new G4SubtractionSolid("Panel3LowerDetectorMountTubeCutLeft",
                            tubeSolid,
                            legEnvelopeCutter,
-                           lowerCutterRotation,
-                           lowerLeftCutterPosition);
+                           lowerLeftCutterTransform);
 
   G4SubtractionSolid *lowerTubeSolid =
     new G4SubtractionSolid("Panel3LowerDetectorMountTubeSolid",
                            lowerTubeCutLeft,
                            legEnvelopeCutter,
-                           lowerCutterRotation,
-                           lowerRightCutterPosition);
+                           lowerRightCutterTransform);
 
   G4LogicalVolume *upperTubeLV = new G4LogicalVolume(upperTubeSolid,
                                                      Materials->Steel,
