@@ -363,10 +363,9 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
   // Use second leg/mount-tube envelopes as additional cutters on the side away
   // from the frame center.  This removes small diagonal-tube tips that extend
   // beyond the real mating tube envelope after the first Boolean cut.  The
-  // cutter solids are slightly oversized, so the nominal one-tube-width
-  // separation gives a small overlap instead of an exactly coplanar Boolean
-  // boundary.
-  const G4double legSecondCutterSeparation = legOuterX;
+  // second leg cutter is shifted in the Panel 3 frame Y direction before being
+  // transformed into the gusset Boolean-local coordinates.
+  const G4double legSecondCutterSeparation = 4.0 * inch;
   const G4double mountTubeSecondCutterNormalSeparation =
     mountTubeOuter;
 
@@ -397,10 +396,9 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                legEnvelopeCutter,
                                legCutterTransform);
 
-      const G4double legOutwardSign = (legPosition.x() > 0.0) ? 1.0 : -1.0;
       G4ThreeVector secondLegCutterOffsetInFrame(
-        legOutwardSign * legSecondCutterSeparation,
         0.0,
+        mountTubeOutwardSign * legSecondCutterSeparation,
         0.0);
       G4ThreeVector secondLegCutterPosition =
         inverseGussetRotation *
@@ -568,21 +566,21 @@ void LADDetectorConstructionHodoCreator::BuildChannels(G4AssemblyVolume *frameAs
 
   const G4double channelCenterX = -0.125 * inch;
   const G4double channelCenterY = 82.9380496 * inch;
-  const G4double channelCenterZ = 3.8125 * inch;
+  const G4double channelCenterZ = -3.8125 * inch;
 
   G4Box *channelOuterSolid = new G4Box("Panel3ChannelOuterSolid",
                                        channelLength / 2.0,
                                        channelOuter / 2.0,
                                        channelOuter / 2.0);
 
-  // Open the +local-Z face while leaving a back web and two side lips.
+  // Open the -local-Z face while leaving the back web against the mount tube.
   G4Box *channelOpenCutter = new G4Box("Panel3ChannelOpenCutter",
                                        channelLength / 2.0 + 0.1 * mm,
                                        (channelOuter - 2.0 * channelWall) / 2.0,
                                        (channelOuter - channelWall) / 2.0 + 0.1 * mm);
   G4ThreeVector openCutterPosition(0.0,
                                    0.0,
-                                   channelWall / 2.0);
+                                   -channelWall / 2.0);
 
   G4SubtractionSolid *channelSolid =
     new G4SubtractionSolid("Panel3ChannelSolid",
