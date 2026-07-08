@@ -32,6 +32,7 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
   //
   //   center spacing = 1/2 * (hodo wall thickness + mount tube width)
   //                  + item-8 channel width
+  //                  + clearance between hodo wall and channel
   //
   // Local Z is the hodo-wall thickness direction in the current wall geometry.
   // Flip the sign of panel3FrameOffsetZ if visualization shows the frame on the
@@ -39,8 +40,11 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
   const G4double hodoWallThickness = WallThick;
   const G4double mountTubeWidth = 6.0 * inch;
   const G4double item8ChannelWidth = 1.625 * inch; // Unistrut P1000 nominal width
+  const G4double panel3HodoClearance = 0.5 * inch;
   const G4double panel3FrameOffsetZ =
-    0.5 * (hodoWallThickness + mountTubeWidth) + item8ChannelWidth;
+    0.5 * (hodoWallThickness + mountTubeWidth) +
+    item8ChannelWidth +
+    panel3HodoClearance;
 
   G4ThreeVector frameOffsetLocal(0.0, 0.0, panel3FrameOffsetZ);
   G4ThreeVector frameCenterHall =
