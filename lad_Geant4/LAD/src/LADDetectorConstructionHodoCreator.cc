@@ -665,11 +665,13 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                              mountTubeOuter / 2.0 + 0.1 * mm,
                                              mountTubeOuter / 2.0 + 0.1 * mm);
 
-  // Use a second mount-tube envelope as an additional cutter on the side away
-  // from the frame center.  The second cutter is shifted along the frame Y
-  // direction, not the tilted tube-local Y direction.  The cutter solids are
-  // slightly oversized, so a nominal 6-inch separation gives a small overlap
-  // instead of an exactly coplanar Boolean boundary.
+  // Use second leg/mount-tube envelopes as additional cutters on the side away
+  // from the frame center.  This removes small diagonal-tube tips that extend
+  // beyond the real mating tube envelope after the first Boolean cut.  The
+  // cutter solids are slightly oversized, so the nominal one-tube-width
+  // separation gives a small overlap instead of an exactly coplanar Boolean
+  // boundary.
+  const G4double legSecondCutterSeparation = legOuterX;
   const G4double mountTubeSecondCutterNormalSeparation =
     mountTubeOuter;
 
@@ -700,6 +702,23 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                legEnvelopeCutter,
                                legCutterTransform);
 
+      const G4double legOutwardSign = (legPosition.x() > 0.0) ? 1.0 : -1.0;
+      G4ThreeVector secondLegCutterOffsetInFrame(
+        legOutwardSign * legSecondCutterSeparation,
+        0.0,
+        0.0);
+      G4ThreeVector secondLegCutterPosition =
+        inverseGussetRotation *
+        (legPosition + secondLegCutterOffsetInFrame - gussetPosition);
+      G4Transform3D secondLegCutterTransform(legCutterRotation,
+                                             secondLegCutterPosition);
+
+      G4SubtractionSolid *gussetCutSecondLeg =
+        new G4SubtractionSolid(name + "CutSecondLeg",
+                               gussetCutLeg,
+                               legEnvelopeCutter,
+                               secondLegCutterTransform);
+
       G4RotationMatrix mountTubeRotation;
       mountTubeRotation.rotateZ(mountTubeRotationAngle);
       G4RotationMatrix mountTubeCutterRotation =
@@ -711,7 +730,7 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
 
       G4SubtractionSolid *gussetCutMountTube =
         new G4SubtractionSolid(name + "CutMountTube",
-                               gussetCutLeg,
+                               gussetCutSecondLeg,
                                mountTubeEnvelopeCutter,
                                mountTubeCutterTransform);
 
