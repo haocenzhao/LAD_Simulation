@@ -373,7 +373,7 @@ void LADDetectorConstructionHodoCreator::BuildMountingPads(G4AssemblyVolume *fra
   const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
 
   const G4double topBottomPadX = legCenterX;
-  const G4double topBottomPadY = 0.5 * frameHeight - 0.5 * padThickness;
+  const G4double topBottomPadY = 0.5 * frameHeight + 0.5 * padThickness;
   const G4double padZ = 0.0 * inch;
 
   // The side pads are the same 12-inch square plates mounted vertically on the
@@ -425,15 +425,13 @@ void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *fra
 {
   // Item 9: VERTICAL LEG, 6 x 4 x .25 wall, ASTM A500 Grade B.
   // Model it as a hollow rectangular tube using a Boolean subtraction.
-  const G4double padThickness = 0.75 * inch;
-
   const G4double frameHeight = 216.0 * inch;
   const G4double legInnerClearance = 94.50 * inch;
 
   const G4double legOuterX = 4.0 * inch;
   const G4double legOuterZ = 6.0 * inch;
   const G4double legWall   = 0.25 * inch;
-  const G4double legLength = frameHeight - 2.0 * padThickness;
+  const G4double legLength = frameHeight;
 
   const G4double legInnerX = legOuterX - 2.0 * legWall;
   const G4double legInnerZ = legOuterZ - 2.0 * legWall;
@@ -481,18 +479,17 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   const G4double tubeWall  = 0.25 * inch;
   const G4double tubeInner = tubeOuter - 2.0 * tubeWall;
 
-  const G4double padThickness = 0.75 * inch;
   const G4double frameHeight = 216.0 * inch;
   const G4double legInnerClearance = 94.50 * inch;
   const G4double legOuterX  = 4.0 * inch;
   const G4double legOuterZ  = 6.0 * inch;
-  const G4double legLength  = frameHeight - 2.0 * padThickness;
+  const G4double legLength  = frameHeight;
   const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
 
-  const G4double tubeLength = 96.0625 * inch; // 96 1/16 from the Panel 3 drawing
+  const G4double tubeLength = 96.83644024 * inch;
   const G4double tubeAngle  = 7.35 * deg;
-  const G4double tubeCenterY =
-    0.5 * (74.83 + 87.02) * inch + (tubeOuter / 2.0) / std::cos(tubeAngle);
+  const G4double tubeCenterX = 0.3837904539 * inch;
+  const G4double tubeCenterY = 84.00861288 * inch;
   const G4double tubeCenterZ = 0.0 * inch;
 
   G4Box *tubeOuterSolid = new G4Box("Panel3DetectorMountTubeOuterSolid",
@@ -526,13 +523,18 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   //   cutter_in_tube = inverse(tube_in_frame) * leg_in_frame
   // In frame coordinates the vertical legs are not rotated, while the upper
   // and lower tubes are rotated by +/-tubeAngle around Z.
+  G4ThreeVector leftLegPosition(-legCenterX, 0.0, 0.0);
+  G4ThreeVector rightLegPosition(legCenterX, 0.0, 0.0);
+  G4ThreeVector upperTubePosition(tubeCenterX, tubeCenterY, tubeCenterZ);
+  G4ThreeVector lowerTubePosition(tubeCenterX, -tubeCenterY, tubeCenterZ);
+
   G4RotationMatrix upperCutterRotation;
   upperCutterRotation.rotateZ(-tubeAngle);
 
   G4ThreeVector upperLeftCutterPosition =
-    upperCutterRotation * G4ThreeVector(-legCenterX, -tubeCenterY, 0.0);
+    upperCutterRotation * (leftLegPosition - upperTubePosition);
   G4ThreeVector upperRightCutterPosition =
-    upperCutterRotation * G4ThreeVector( legCenterX, -tubeCenterY, 0.0);
+    upperCutterRotation * (rightLegPosition - upperTubePosition);
 
   G4Transform3D upperLeftCutterTransform(upperCutterRotation,
                                          upperLeftCutterPosition);
@@ -555,9 +557,9 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   lowerCutterRotation.rotateZ(tubeAngle);
 
   G4ThreeVector lowerLeftCutterPosition =
-    lowerCutterRotation * G4ThreeVector(-legCenterX, tubeCenterY, 0.0);
+    lowerCutterRotation * (leftLegPosition - lowerTubePosition);
   G4ThreeVector lowerRightCutterPosition =
-    lowerCutterRotation * G4ThreeVector( legCenterX, tubeCenterY, 0.0);
+    lowerCutterRotation * (rightLegPosition - lowerTubePosition);
 
   G4Transform3D lowerLeftCutterTransform(lowerCutterRotation,
                                          lowerLeftCutterPosition);
@@ -592,9 +594,6 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
   G4RotationMatrix *lowerTubeRotation = new G4RotationMatrix();
   lowerTubeRotation->rotateZ(-tubeAngle);
 
-  G4ThreeVector upperTubePosition(0.0, tubeCenterY, tubeCenterZ);
-  G4ThreeVector lowerTubePosition(0.0, -tubeCenterY, tubeCenterZ);
-
   frameAssembly->AddPlacedVolume(upperTubeLV, upperTubePosition, upperTubeRotation);
   frameAssembly->AddPlacedVolume(lowerTubeLV, lowerTubePosition, lowerTubeRotation);
 }
@@ -606,31 +605,27 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
   // Items 12 and 13: PANEL 3, FRAME GUSSET-1/2, 6 x 4 x .25 wall,
   // ASTM A500 Grade B.  The four diagonal gussets are 40-inch tubes at +/-45 deg.
   // Left pair: item 12.  Right pair: item 13.
-  const G4double padThickness = 0.75 * inch;
   const G4double frameHeight = 216.0 * inch;
   const G4double legInnerClearance = 94.50 * inch;
 
   const G4double legOuterX = 4.0 * inch;
   const G4double legOuterZ = 6.0 * inch;
-  const G4double legLength = frameHeight - 2.0 * padThickness;
+  const G4double legLength = frameHeight;
   const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
 
   const G4double mountTubeOuter = 6.0 * inch;
-  const G4double mountTubeLength = 96.0625 * inch;
+  const G4double mountTubeLength = 96.83644024 * inch;
   const G4double mountTubeAngle = 7.35 * deg;
-  const G4double mountTubeCenterY =
-    0.5 * (74.83 + 87.02) * inch
-    + (mountTubeOuter / 2.0) / std::cos(mountTubeAngle);
+  const G4double mountTubeCenterX = 0.3837904539 * inch;
+  const G4double mountTubeCenterY = 84.00861288 * inch;
 
   const G4double gussetLength = 40.0 * inch;
-  const G4double gussetOuterY = 6.0 * inch;
-  const G4double gussetOuterZ = 4.0 * inch;
+  const G4double gussetOuterY = 4.0 * inch;
+  const G4double gussetOuterZ = 6.0 * inch;
   const G4double gussetWall = 0.25 * inch;
   const G4double gussetInnerY = gussetOuterY - 2.0 * gussetWall;
   const G4double gussetInnerZ = gussetOuterZ - 2.0 * gussetWall;
   const G4double gussetAngle = 45.0 * deg;
-  const G4double gussetProjectionX =
-    gussetLength * std::cos(gussetAngle);
 
   G4Box *gussetOuterSolid = new G4Box("Panel3GussetOuterSolid",
                                       gussetLength / 2.0,
@@ -733,88 +728,24 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
 
   G4ThreeVector leftLegPosition(-legCenterX, 0.0, 0.0);
   G4ThreeVector rightLegPosition(legCenterX, 0.0, 0.0);
-  G4ThreeVector upperMountTubePosition(0.0, mountTubeCenterY, 0.0);
-  G4ThreeVector lowerMountTubePosition(0.0, -mountTubeCenterY, 0.0);
+  G4ThreeVector upperMountTubePosition(mountTubeCenterX,
+                                       mountTubeCenterY,
+                                       0.0);
+  G4ThreeVector lowerMountTubePosition(mountTubeCenterX,
+                                       -mountTubeCenterY,
+                                       0.0);
 
-  const G4double legInnerFaceX = legInnerClearance / 2.0;
-  const G4double item12MountEndX = -legInnerFaceX + gussetProjectionX;
-  const G4double item13MountEndX = legInnerFaceX - gussetProjectionX;
-
-  auto UpperMountTubeCenterlineY =
-    [&](G4double x) -> G4double
-    {
-      return mountTubeCenterY + x * std::tan(mountTubeAngle);
-    };
-  auto LowerMountTubeCenterlineY =
-    [&](G4double x) -> G4double
-    {
-      return -mountTubeCenterY - x * std::tan(mountTubeAngle);
-    };
-
-  // Use the sine rule in the triangle made by the vertical leg, the 45-degree
-  // gusset, and the +/-7.35-degree detector mount tube.  Item 12 uses the
-  // 37.65-degree mount-side angle; item 13 uses 52.35 degrees.
-  const G4double item12LegMountIntersectionAngle =
-    90.0 * deg + mountTubeAngle;
-  const G4double item13LegMountIntersectionAngle =
-    90.0 * deg - mountTubeAngle;
-  const G4double item12MountEndAngle =
-    gussetAngle - mountTubeAngle;
-  const G4double item13MountEndAngle =
-    gussetAngle + mountTubeAngle;
-  const G4double item12LegDrop =
-    gussetLength * std::sin(item12MountEndAngle)
-    / std::sin(item12LegMountIntersectionAngle);
-  const G4double item13LegDrop =
-    gussetLength * std::sin(item13MountEndAngle)
-    / std::sin(item13LegMountIntersectionAngle);
-
-  const G4double upperItem12LegEndY =
-    UpperMountTubeCenterlineY(-legInnerFaceX) - item12LegDrop;
-  const G4double upperItem13LegEndY =
-    UpperMountTubeCenterlineY( legInnerFaceX) - item13LegDrop;
-  const G4double upperItem12MountEndY =
-    UpperMountTubeCenterlineY(item12MountEndX);
-  const G4double upperItem13MountEndY =
-    UpperMountTubeCenterlineY(item13MountEndX);
-  const G4double lowerItem12LegEndY =
-    LowerMountTubeCenterlineY(-legInnerFaceX) + item12LegDrop;
-  const G4double lowerItem13LegEndY =
-    LowerMountTubeCenterlineY( legInnerFaceX) + item13LegDrop;
-  const G4double lowerItem12MountEndY =
-    LowerMountTubeCenterlineY(item12MountEndX);
-  const G4double lowerItem13MountEndY =
-    LowerMountTubeCenterlineY(item13MountEndX);
-
-  // The sine-rule points above describe the contact edge of the 6-inch-wide
-  // gusset tube.  Move to the G4Box center by half of the gusset width,
-  // projected along the 45-degree gusset normal.
-  const G4double gussetHalfWidthProjection =
-    0.5 * gussetOuterY * std::cos(gussetAngle);
-
-  G4ThreeVector upperLeftGussetPosition(0.5 * (-legInnerFaceX + item12MountEndX)
-                                        + gussetHalfWidthProjection,
-                                        0.5 * (upperItem12LegEndY
-                                               + upperItem12MountEndY)
-                                        - gussetHalfWidthProjection,
+  G4ThreeVector upperLeftGussetPosition(-35.22918472 * inch,
+                                        66.48267017 * inch,
                                         0.0);
-  G4ThreeVector upperRightGussetPosition(0.5 * (legInnerFaceX + item13MountEndX)
-                                         - gussetHalfWidthProjection,
-                                         0.5 * (upperItem13LegEndY
-                                                + upperItem13MountEndY)
-                                         - gussetHalfWidthProjection,
+  G4ThreeVector upperRightGussetPosition(35.22918472 * inch,
+                                         71.32569927 * inch,
                                          0.0);
-  G4ThreeVector lowerLeftGussetPosition(0.5 * (-legInnerFaceX + item12MountEndX)
-                                        + gussetHalfWidthProjection,
-                                        0.5 * (lowerItem12LegEndY
-                                               + lowerItem12MountEndY)
-                                        + gussetHalfWidthProjection,
+  G4ThreeVector lowerLeftGussetPosition(-35.22918472 * inch,
+                                        -66.48267017 * inch,
                                         0.0);
-  G4ThreeVector lowerRightGussetPosition(0.5 * (legInnerFaceX + item13MountEndX)
-                                         - gussetHalfWidthProjection,
-                                         0.5 * (lowerItem13LegEndY
-                                                + lowerItem13MountEndY)
-                                         + gussetHalfWidthProjection,
+  G4ThreeVector lowerRightGussetPosition(35.22918472 * inch,
+                                         -71.32569927 * inch,
                                          0.0);
 
   G4SubtractionSolid *upperLeftGussetSolid =
