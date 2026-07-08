@@ -311,10 +311,10 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
   const G4double frameHeight = 216.0 * inch;
   const G4double legInnerClearance = 94.50 * inch;
 
-  const G4double legOuterX = 4.0 * inch;
   const G4double legOuterZ = 6.0 * inch;
   const G4double legLength = frameHeight;
-  const G4double legCenterX = 0.5 * (legInnerClearance + legOuterX);
+  const G4double legCutterOuterX = 6.0 * inch;
+  const G4double legCutterCenterX = 0.5 * (legInnerClearance + legCutterOuterX);
 
   const G4double mountTubeOuter = 6.0 * inch;
   const G4double mountTubeLength = 96.83644024 * inch;
@@ -349,9 +349,12 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                            G4ThreeVector());
 
   // Use solid envelopes as cutters so the gussets do not overlap the vertical
-  // legs or detector mount tubes.  The real weld/miter details are simplified.
+  // legs or detector mount tubes.  The gusset leg cutter is intentionally
+  // wider than the real 4-inch vertical leg.  Its inner faces are kept at the
+  // same +/-47.25-inch locations, so the cutter center is based on the 94.5-inch
+  // inner clearance and the 6-inch cutter width.
   G4Box *legEnvelopeCutter = new G4Box("Panel3GussetLegEnvelopeCutter",
-                                       legOuterX / 2.0 + 0.1 * mm,
+                                       legCutterOuterX / 2.0 + 0.1 * mm,
                                        legLength / 2.0 + 0.1 * mm,
                                        legOuterZ / 2.0 + 0.1 * mm);
 
@@ -360,12 +363,9 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                              mountTubeOuter / 2.0 + 0.1 * mm,
                                              mountTubeOuter / 2.0 + 0.1 * mm);
 
-  // Use second leg/mount-tube envelopes as additional cutters on the side away
+  // Use a second mount-tube envelope as an additional cutter on the side away
   // from the frame center.  This removes small diagonal-tube tips that extend
-  // beyond the real mating tube envelope after the first Boolean cut.  The
-  // second leg cutter is shifted in the Panel 3 frame Y direction before being
-  // transformed into the gusset Boolean-local coordinates.
-  const G4double legSecondCutterSeparation = 4.0 * inch;
+  // beyond the real mating tube envelope after the first Boolean cut.
   const G4double mountTubeSecondCutterNormalSeparation =
     mountTubeOuter;
 
@@ -396,22 +396,6 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                legEnvelopeCutter,
                                legCutterTransform);
 
-      G4ThreeVector secondLegCutterOffsetInFrame(
-        0.0,
-        mountTubeOutwardSign * legSecondCutterSeparation,
-        0.0);
-      G4ThreeVector secondLegCutterPosition =
-        inverseGussetRotation *
-        (legPosition + secondLegCutterOffsetInFrame - gussetPosition);
-      G4Transform3D secondLegCutterTransform(legCutterRotation,
-                                             secondLegCutterPosition);
-
-      G4SubtractionSolid *gussetCutSecondLeg =
-        new G4SubtractionSolid(name + "CutSecondLeg",
-                               gussetCutLeg,
-                               legEnvelopeCutter,
-                               secondLegCutterTransform);
-
       G4RotationMatrix mountTubeRotation;
       mountTubeRotation.rotateZ(mountTubeRotationAngle);
       G4RotationMatrix mountTubeCutterRotation =
@@ -423,7 +407,7 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
 
       G4SubtractionSolid *gussetCutMountTube =
         new G4SubtractionSolid(name + "CutMountTube",
-                               gussetCutSecondLeg,
+                               gussetCutLeg,
                                mountTubeEnvelopeCutter,
                                mountTubeCutterTransform);
 
@@ -446,8 +430,8 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
                                     secondMountTubeCutterTransform);
     };
 
-  G4ThreeVector leftLegPosition(-legCenterX, 0.0, 0.0);
-  G4ThreeVector rightLegPosition(legCenterX, 0.0, 0.0);
+  G4ThreeVector leftLegPosition(-legCutterCenterX, 0.0, 0.0);
+  G4ThreeVector rightLegPosition(legCutterCenterX, 0.0, 0.0);
   G4ThreeVector upperMountTubePosition(mountTubeCenterX,
                                        mountTubeCenterY,
                                        0.0);
