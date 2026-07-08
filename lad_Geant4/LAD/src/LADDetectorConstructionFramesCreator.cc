@@ -555,7 +555,64 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
 }
 
 
-void LADDetectorConstructionHodoCreator::BuildChannels(G4AssemblyVolume *,
-                                                       LADMaterials *)
+void LADDetectorConstructionHodoCreator::BuildChannels(G4AssemblyVolume *frameAssembly,
+                                                       LADMaterials *Materials)
 {
+  // Item 8: detector channel.  Simplified as a 94 x 1-5/8 x 1-5/8 inch
+  // U-channel with one long side opened.  The channels are parallel to the
+  // upper/lower detector mount tubes.
+  const G4double channelLength = 94.0 * inch;
+  const G4double channelOuter  = 1.625 * inch;
+  const G4double channelWall   = 0.125 * inch; // provisional simplified wall
+  const G4double channelAngle  = 7.35 * deg;
+
+  const G4double channelCenterX = -0.125 * inch;
+  const G4double channelCenterY = 82.9380496 * inch;
+  const G4double channelCenterZ = 3.8125 * inch;
+
+  G4Box *channelOuterSolid = new G4Box("Panel3ChannelOuterSolid",
+                                       channelLength / 2.0,
+                                       channelOuter / 2.0,
+                                       channelOuter / 2.0);
+
+  // Open the +local-Z face while leaving a back web and two side lips.
+  G4Box *channelOpenCutter = new G4Box("Panel3ChannelOpenCutter",
+                                       channelLength / 2.0 + 0.1 * mm,
+                                       (channelOuter - 2.0 * channelWall) / 2.0,
+                                       (channelOuter - channelWall) / 2.0 + 0.1 * mm);
+  G4ThreeVector openCutterPosition(0.0,
+                                   0.0,
+                                   channelWall / 2.0);
+
+  G4SubtractionSolid *channelSolid =
+    new G4SubtractionSolid("Panel3ChannelSolid",
+                           channelOuterSolid,
+                           channelOpenCutter,
+                           nullptr,
+                           openCutterPosition);
+
+  G4LogicalVolume *channelLV = new G4LogicalVolume(channelSolid,
+                                                   Materials->Steel,
+                                                   "Panel3ChannelLV");
+  channelLV->SetVisAttributes(G4VisAttributes(G4Colour(0.32, 0.32, 0.32)));
+
+  G4RotationMatrix *upperChannelRotation = new G4RotationMatrix();
+  upperChannelRotation->rotateZ(channelAngle);
+
+  G4RotationMatrix *lowerChannelRotation = new G4RotationMatrix();
+  lowerChannelRotation->rotateZ(-channelAngle);
+
+  G4ThreeVector upperChannelPosition(channelCenterX,
+                                     channelCenterY,
+                                     channelCenterZ);
+  G4ThreeVector lowerChannelPosition(channelCenterX,
+                                     -channelCenterY,
+                                     channelCenterZ);
+
+  frameAssembly->AddPlacedVolume(channelLV,
+                                 upperChannelPosition,
+                                 upperChannelRotation);
+  frameAssembly->AddPlacedVolume(channelLV,
+                                 lowerChannelPosition,
+                                 lowerChannelRotation);
 }
