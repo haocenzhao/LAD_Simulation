@@ -350,7 +350,15 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
   G4ThreeVector frameOffsetLocal(0.0, 0.0, panel3FrameOffsetZ);
   G4ThreeVector frameCenterHall =
     hodoCenterHall + hodoRotationHall * frameOffsetLocal;
-  G4RotationMatrix *frameRotationHall = new G4RotationMatrix(hodoRotationHall);
+
+  // The Panel 3 drawing orientation is opposite to the hodo-wall local X/Y
+  // orientation used here.  Rotate the completed local frame by 180 deg about
+  // its own center first, then move/rotate it into the hall with the hodo wall.
+  G4RotationMatrix panel3LocalRotation;
+  panel3LocalRotation.rotateZ(180.0 * deg);
+
+  G4RotationMatrix *frameRotationHall =
+    new G4RotationMatrix(hodoRotationHall * panel3LocalRotation);
 
   frameAssembly->MakeImprint(worldLV,
                              frameCenterHall,
