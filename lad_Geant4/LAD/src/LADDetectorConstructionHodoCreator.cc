@@ -620,8 +620,8 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
   const G4double mountTubeCenterY = 84.00861288 * inch;
 
   const G4double gussetLength = 40.0 * inch;
-  const G4double gussetOuterY = 4.0 * inch;
-  const G4double gussetOuterZ = 6.0 * inch;
+  const G4double gussetOuterY = 6.0 * inch;
+  const G4double gussetOuterZ = 4.0 * inch;
   const G4double gussetWall = 0.25 * inch;
   const G4double gussetInnerY = gussetOuterY - 2.0 * gussetWall;
   const G4double gussetInnerZ = gussetOuterZ - 2.0 * gussetWall;
