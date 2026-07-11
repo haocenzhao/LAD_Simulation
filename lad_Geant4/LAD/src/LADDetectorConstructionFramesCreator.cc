@@ -96,7 +96,7 @@ void LADDetectorConstructionHodoCreator::BuildMountingPads(G4AssemblyVolume *fra
                               padSize / 2.0);
 
   G4LogicalVolume *padLV = new G4LogicalVolume(padSolid,
-                                               Materials->Steel,
+                                               Materials->ASTM_A36,
                                                "Panel3MountingPadLV");
   padLV->SetVisAttributes(G4VisAttributes(G4Colour(0.45, 0.45, 0.45)));
 
@@ -162,7 +162,7 @@ void LADDetectorConstructionHodoCreator::BuildVerticalLegs(G4AssemblyVolume *fra
                            G4ThreeVector());
 
   G4LogicalVolume *legLV = new G4LogicalVolume(legSolid,
-                                               Materials->Steel,
+                                               Materials->ASTM_A500_GradeB,
                                                "Panel3VerticalLegLV");
   legLV->SetVisAttributes(G4VisAttributes(G4Colour(0.35, 0.35, 0.35)));
 
@@ -286,12 +286,12 @@ void LADDetectorConstructionHodoCreator::BuildDetectorMountTubes(G4AssemblyVolum
                            lowerRightCutterTransform);
 
   G4LogicalVolume *upperTubeLV = new G4LogicalVolume(upperTubeSolid,
-                                                     Materials->Steel,
+                                                     Materials->ASTM_A500_GradeB,
                                                      "Panel3UpperDetectorMountTubeLV");
   upperTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.30, 0.30, 0.30)));
 
   G4LogicalVolume *lowerTubeLV = new G4LogicalVolume(lowerTubeSolid,
-                                                     Materials->Steel,
+                                                     Materials->ASTM_A500_GradeB,
                                                      "Panel3LowerDetectorMountTubeLV");
   lowerTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.30, 0.30, 0.30)));
 
@@ -494,19 +494,19 @@ void LADDetectorConstructionHodoCreator::BuildGussets(G4AssemblyVolume *frameAss
 
   G4LogicalVolume *upperLeftGussetLV =
     new G4LogicalVolume(upperLeftGussetSolid,
-                        Materials->Steel,
+                        Materials->ASTM_A500_GradeB,
                         "Panel3Item12UpperLeftGussetLV");
   G4LogicalVolume *upperRightGussetLV =
     new G4LogicalVolume(upperRightGussetSolid,
-                        Materials->Steel,
+                        Materials->ASTM_A500_GradeB,
                         "Panel3Item13UpperRightGussetLV");
   G4LogicalVolume *lowerLeftGussetLV =
     new G4LogicalVolume(lowerLeftGussetSolid,
-                        Materials->Steel,
+                        Materials->ASTM_A500_GradeB,
                         "Panel3Item12LowerLeftGussetLV");
   G4LogicalVolume *lowerRightGussetLV =
     new G4LogicalVolume(lowerRightGussetSolid,
-                        Materials->Steel,
+                        Materials->ASTM_A500_GradeB,
                         "Panel3Item13LowerRightGussetLV");
 
   upperLeftGussetLV->SetVisAttributes(G4VisAttributes(G4Colour(0.25, 0.25, 0.25)));
@@ -578,7 +578,7 @@ void LADDetectorConstructionHodoCreator::BuildChannels(G4AssemblyVolume *frameAs
                            openCutterPosition);
 
   G4LogicalVolume *channelLV = new G4LogicalVolume(channelSolid,
-                                                   Materials->Steel,
+                                                   Materials->Unistrut_P1000_Steel,
                                                    "Panel3ChannelLV");
   channelLV->SetVisAttributes(G4VisAttributes(G4Colour(0.32, 0.32, 0.32)));
 

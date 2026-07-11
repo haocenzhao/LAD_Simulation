@@ -24,6 +24,9 @@ public:
 
   G4Material * Al;
   G4Material * Steel;
+  G4Material * ASTM_A36;
+  G4Material * ASTM_A500_GradeB;
+  G4Material * Unistrut_P1000_Steel;
 
   //From Lucas/Tyler code
   G4Material * H2_gas;

@@ -24,8 +24,46 @@ LADMaterials::LADMaterials()
   G4Element* N  = new G4Element(name="Nitrogen",symbol="N" , z= 7., a=14.01*g/mole);
   G4Element* O  = new G4Element(name="Oxygen"  ,symbol="O" , z= 8., a=16.00*g/mole);
   G4Element* Si = new G4Element(name="Silicon", symbol="Si" ,z= 14.,a=28.09*g/mole);
+  G4Element* Fe = new G4Element(name="Iron", symbol="Fe", z=26., a=55.845*g/mole);
+  G4Element* Mn = new G4Element(name="Manganese", symbol="Mn", z=25., a=54.938*g/mole);
+  G4Element* P_el = new G4Element(name="Phosphorus", symbol="P", z=15., a=30.974*g/mole);
+  G4Element* S_el = new G4Element(name="Sulfur", symbol="S", z=16., a=32.06*g/mole);
+  G4Element* Cu_el = new G4Element(name="Copper", symbol="Cu", z=29., a=63.546*g/mole);
   Al = new G4Material(name="Aluminium", z=13., a=26.98*g/mole,  density=2.70*g/cm3);
-  Steel = new G4Material(name="A36Steel", z=26., a=55.845*g/mole, density=7.85*g/cm3);
+
+  // LAD Panel 3 frame steels.  ASTM specifications give composition ranges;
+  // these are fixed Fe-balance approximations for Geant4 material definitions.
+  // Replace these mass fractions with mill test report values if available.
+  ASTM_A36 = new G4Material(name="ASTM_A36", density=7.80*g/cm3, ncomponents=7);
+  ASTM_A36->AddElement(Fe, fractionmass=0.9802);
+  ASTM_A36->AddElement(C,  fractionmass=0.0026);
+  ASTM_A36->AddElement(Mn, fractionmass=0.0103);
+  ASTM_A36->AddElement(Si, fractionmass=0.0040);
+  ASTM_A36->AddElement(P_el, fractionmass=0.0004);
+  ASTM_A36->AddElement(S_el, fractionmass=0.0005);
+  ASTM_A36->AddElement(Cu_el, fractionmass=0.0020);
+
+  ASTM_A500_GradeB = new G4Material(name="ASTM_A500_GradeB",
+                                    density=7.85*g/cm3,
+                                    ncomponents=6);
+  ASTM_A500_GradeB->AddElement(Fe, fractionmass=0.9812);
+  ASTM_A500_GradeB->AddElement(C,  fractionmass=0.0026);
+  ASTM_A500_GradeB->AddElement(Mn, fractionmass=0.0135);
+  ASTM_A500_GradeB->AddElement(P_el, fractionmass=0.00035);
+  ASTM_A500_GradeB->AddElement(S_el, fractionmass=0.00035);
+  ASTM_A500_GradeB->AddElement(Cu_el, fractionmass=0.0020);
+
+  Unistrut_P1000_Steel = new G4Material(name="Unistrut_P1000_Steel",
+                                        density=7.85*g/cm3,
+                                        ncomponents=5);
+  Unistrut_P1000_Steel->AddElement(Fe, fractionmass=0.9941);
+  Unistrut_P1000_Steel->AddElement(C,  fractionmass=0.0010);
+  Unistrut_P1000_Steel->AddElement(Mn, fractionmass=0.0040);
+  Unistrut_P1000_Steel->AddElement(P_el, fractionmass=0.0004);
+  Unistrut_P1000_Steel->AddElement(S_el, fractionmass=0.0005);
+
+  // Backward-compatible generic steel pointer used by older geometry code.
+  Steel = ASTM_A36;
 
   G4Material * W = new G4Material(name="Tungsten",    z=74., a=183.84*g/mole, density=19.3*g/cm3);
 
