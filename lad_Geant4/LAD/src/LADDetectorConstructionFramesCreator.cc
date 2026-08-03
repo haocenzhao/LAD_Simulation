@@ -52,6 +52,8 @@ void LADDetectorConstructionHodoCreator::BuildSingleStand(
   BuildSingleStandTopPlates(standAssembly, Materials);
   BuildSingleStandVerticalTubes(standAssembly, Materials);
   BuildSingleStandBottomPlates(standAssembly, Materials);
+  BuildSingleStandHorizontalMountingPlates(standAssembly, Materials);
+  BuildSingleStandGussetMountingPlates(standAssembly, Materials);
 
   // The stand is drawn with negative local Y pointing below Panel 3.  Rotate
   // the completed stand in the Panel 3 frame so that the subsequent Panel 3
@@ -115,17 +117,16 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandVerticalTubes(
   LADMaterials *Materials)
 {
   // Drawing 67506-00006, item 6: one 6 x 6 x 3/8 inch wall ASTM A500
-  // Grade B vertical tube per support leg weldment.  The tube spans between
-  // the 1-inch detector mounting plate and the 1-inch structure mounting plate.
+  // Grade B vertical tube per support leg weldment.  The tube spans from the
+  // underside of the detector mounting plate to the top of the structure
+  // mounting plate.
   const G4double tubeOuter = 6.0 * inch;
   const G4double tubeWall = 0.375 * inch;
   const G4double tubeInner = tubeOuter - 2.0 * tubeWall;
 
   const G4double standHeight = 47.25 * inch;
   const G4double topPlateThickness = 1.0 * inch;
-  const G4double bottomPlateThickness = 1.0 * inch;
-  const G4double tubeLength =
-    standHeight - topPlateThickness - bottomPlateThickness;
+  const G4double tubeLength = standHeight - topPlateThickness;
 
   const G4double panel3FrameHeight = 216.0 * inch;
   const G4double panel3PadThickness = 0.75 * inch;
@@ -197,7 +198,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandBottomPlates(
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
   const G4double plateCenterY =
-    panel3BottomPadSurfaceY - standHeight + 0.5 * plateThickness;
+    panel3BottomPadSurfaceY - standHeight - 0.5 * plateThickness;
 
   G4Box *plateSolid = new G4Box("SingleStandBottomPlateSolid",
                                 plateSizeX / 2.0,
@@ -212,6 +213,112 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandBottomPlates(
 
   G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
   G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
+
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalMountingPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 10: one ASTM A36 horizontal mounting plate on
+  // the inward face of each vertical tube.  Dimensions are X x Y x Z.
+  const G4double plateThicknessX = 1.0 * inch;
+  const G4double plateHeightY = 10.0 * inch;
+  const G4double plateSizeZ = 6.0 * inch;
+  const G4double plateBottomHeight = 28.125 * inch;
+
+  const G4double standHeight = 47.25 * inch;
+  const G4double tubeOuter = 6.0 * inch;
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+  const G4double panel3LegInnerClearance = 94.50 * inch;
+  const G4double panel3LegOuterX = 4.0 * inch;
+
+  const G4double tubeCenterX =
+    0.5 * (panel3LegInnerClearance + panel3LegOuterX);
+  const G4double plateOffsetX =
+    0.5 * tubeOuter + 0.5 * plateThicknessX;
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double bottomPlateTopSurfaceY =
+    panel3BottomPadSurfaceY - standHeight;
+  const G4double plateCenterY =
+    bottomPlateTopSurfaceY + plateBottomHeight + 0.5 * plateHeightY;
+
+  G4Box *plateSolid =
+    new G4Box("SingleStandHorizontalMountingPlateSolid",
+              plateThicknessX / 2.0,
+              plateHeightY / 2.0,
+              plateSizeZ / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "SingleStandHorizontalMountingPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.22, 0.22, 0.22)));
+
+  G4ThreeVector leftPlatePosition(-tubeCenterX + plateOffsetX,
+                                  plateCenterY,
+                                  0.0);
+  G4ThreeVector rightPlatePosition(tubeCenterX - plateOffsetX,
+                                   plateCenterY,
+                                   0.0);
+
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandGussetMountingPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 12: one ASTM A36 gusset mounting plate on the
+  // inward face of each vertical tube.  Dimensions are X x Y x Z.
+  const G4double plateThicknessX = 1.0 * inch;
+  const G4double plateHeightY = 6.5 * inch;
+  const G4double plateSizeZ = 6.0 * inch;
+  const G4double plateBottomHeight = 9.75 * inch;
+
+  const G4double standHeight = 47.25 * inch;
+  const G4double tubeOuter = 6.0 * inch;
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+  const G4double panel3LegInnerClearance = 94.50 * inch;
+  const G4double panel3LegOuterX = 4.0 * inch;
+
+  const G4double tubeCenterX =
+    0.5 * (panel3LegInnerClearance + panel3LegOuterX);
+  const G4double plateOffsetX =
+    0.5 * tubeOuter + 0.5 * plateThicknessX;
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double bottomPlateTopSurfaceY =
+    panel3BottomPadSurfaceY - standHeight;
+  const G4double plateCenterY =
+    bottomPlateTopSurfaceY + plateBottomHeight + 0.5 * plateHeightY;
+
+  G4Box *plateSolid =
+    new G4Box("SingleStandGussetMountingPlateSolid",
+              plateThicknessX / 2.0,
+              plateHeightY / 2.0,
+              plateSizeZ / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "SingleStandGussetMountingPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.22, 0.22, 0.22)));
+
+  G4ThreeVector leftPlatePosition(-tubeCenterX + plateOffsetX,
+                                  plateCenterY,
+                                  0.0);
+  G4ThreeVector rightPlatePosition(tubeCenterX - plateOffsetX,
+                                   plateCenterY,
+                                   0.0);
 
   standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
   standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
