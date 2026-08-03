@@ -391,9 +391,8 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalTube(
                         "SingleStandHorizontalTubeLV");
   tubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.25, 0.25, 0.25)));
 
-  standAssembly->AddPlacedVolume(tubeLV,
-                                 G4ThreeVector(0.0, tubeCenterY, 0.0),
-                                 nullptr);
+  G4ThreeVector horizontalTubePosition(0.0, tubeCenterY, 0.0);
+  standAssembly->AddPlacedVolume(tubeLV, horizontalTubePosition, nullptr);
 }
 
 
