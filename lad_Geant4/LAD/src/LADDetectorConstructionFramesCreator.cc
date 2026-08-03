@@ -25,12 +25,15 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
   BuildGussets(frameAssembly, Materials);
   BuildChannels(frameAssembly, Materials);
 
+  G4RotationMatrix frameRotationInPanel3;
+
   PlacePanel3LocalAssembly(frameAssembly,
                            worldLV,
                            panelIndex,
                            160000,
                            hodoCenterHall,
-                           hodoRotationHall);
+                           hodoRotationHall,
+                           frameRotationInPanel3);
 }
 
 
@@ -48,12 +51,19 @@ void LADDetectorConstructionHodoCreator::BuildSingleStand(
 
   BuildSingleStandTopPlates(standAssembly, Materials);
 
+  // The stand is drawn with negative local Y pointing below Panel 3.  Rotate
+  // the completed stand in the Panel 3 frame so that the subsequent Panel 3
+  // drawing-orientation correction preserves that final below-panel position.
+  G4RotationMatrix standRotationInPanel3;
+  standRotationInPanel3.rotateZ(180.0 * deg);
+
   PlacePanel3LocalAssembly(standAssembly,
                            worldLV,
                            panelIndex,
                            170000,
                            hodoCenterHall,
-                           hodoRotationHall);
+                           hodoRotationHall,
+                           standRotationInPanel3);
 }
 
 
@@ -104,7 +114,8 @@ void LADDetectorConstructionHodoCreator::PlacePanel3LocalAssembly(
   G4int panelIndex,
   G4int copyNumberBase,
   const G4ThreeVector &hodoCenterHall,
-  const G4RotationMatrix &hodoRotationHall)
+  const G4RotationMatrix &hodoRotationHall,
+  const G4RotationMatrix &assemblyRotationInPanel3)
 {
 
   // The hodo wall rests against Panel 3; their centers should therefore differ
@@ -138,12 +149,14 @@ void LADDetectorConstructionHodoCreator::PlacePanel3LocalAssembly(
   G4RotationMatrix panel3LocalRotation;
   panel3LocalRotation.rotateZ(180.0 * deg);
 
-  G4RotationMatrix *frameRotationHall =
-    new G4RotationMatrix(hodoRotationHall * panel3LocalRotation);
+  G4RotationMatrix *assemblyRotationHall =
+    new G4RotationMatrix(hodoRotationHall *
+                         panel3LocalRotation *
+                         assemblyRotationInPanel3);
 
   assembly->MakeImprint(worldLV,
                         frameCenterHall,
-                        frameRotationHall,
+                        assemblyRotationHall,
                         copyNumberBase + panelIndex * 100,
                         fCheckOverlaps);
 }

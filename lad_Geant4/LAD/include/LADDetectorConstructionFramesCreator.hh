@@ -21,7 +21,8 @@ void PlacePanel3LocalAssembly(G4AssemblyVolume *assembly,
                               G4int panelIndex,
                               G4int copyNumberBase,
                               const G4ThreeVector &hodoCenterHall,
-                              const G4RotationMatrix &hodoRotationHall);
+                              const G4RotationMatrix &hodoRotationHall,
+                              const G4RotationMatrix &assemblyRotationInPanel3);
 void BuildMountingPads(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
 void BuildVerticalLegs(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
 void BuildDetectorMountTubes(G4AssemblyVolume *frameAssembly, LADMaterials *Materials);
