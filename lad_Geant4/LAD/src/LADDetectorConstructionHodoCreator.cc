@@ -185,6 +185,16 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
 
           BuildPanel3Frame(worldLV, Materials, panelIndex, wallPosition, wallRotation);
 
+          // The third wall has one scintillator layer and uses the single-wall
+          // stand defined by drawing 67506-00006.
+          if (ww == Constants->NoOfWalls - 1) {
+            BuildSingleStand(worldLV,
+                             Materials,
+                             panelIndex,
+                             wallPosition,
+                             wallRotation);
+          }
+
 	  
 	  // There is something magic calling with the same name each solid and logic
 	  // volume, although they are different on each loop, without deleting the

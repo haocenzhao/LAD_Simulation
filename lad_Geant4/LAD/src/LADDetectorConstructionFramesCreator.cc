@@ -25,6 +25,88 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
   BuildGussets(frameAssembly, Materials);
   BuildChannels(frameAssembly, Materials);
 
+  PlacePanel3LocalAssembly(frameAssembly,
+                           worldLV,
+                           panelIndex,
+                           160000,
+                           hodoCenterHall,
+                           hodoRotationHall);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStand(
+  G4LogicalVolume *worldLV,
+  LADMaterials *Materials,
+  G4int panelIndex,
+  const G4ThreeVector &hodoCenterHall,
+  const G4RotationMatrix &hodoRotationHall)
+{
+  // Build in the Panel 3 local coordinate system, whose origin is the
+  // nominal center of Panel 3.  The complete stand is transformed only after
+  // all of its local components have been added.
+  G4AssemblyVolume *standAssembly = new G4AssemblyVolume();
+
+  BuildSingleStandTopPlates(standAssembly, Materials);
+
+  PlacePanel3LocalAssembly(standAssembly,
+                           worldLV,
+                           panelIndex,
+                           170000,
+                           hodoCenterHall,
+                           hodoRotationHall);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandTopPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 13: two 12 x 12 x 1 inch ASTM A36 detector
+  // mounting plates.  Their top faces touch the bottom faces of the Panel 3
+  // mounting pads exactly; the solids do not occupy the same volume.
+  const G4double plateSize = 12.0 * inch;
+  const G4double plateThickness = 1.0 * inch;
+
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+  const G4double panel3LegInnerClearance = 94.50 * inch;
+  const G4double panel3LegOuterX = 4.0 * inch;
+
+  const G4double plateCenterX =
+    0.5 * (panel3LegInnerClearance + panel3LegOuterX);
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double plateCenterY =
+    panel3BottomPadSurfaceY - 0.5 * plateThickness;
+
+  G4Box *plateSolid = new G4Box("SingleStandTopPlateSolid",
+                                plateSize / 2.0,
+                                plateThickness / 2.0,
+                                plateSize / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "SingleStandTopPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.20, 0.20, 0.20)));
+
+  G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
+  G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
+
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::PlacePanel3LocalAssembly(
+  G4AssemblyVolume *assembly,
+  G4LogicalVolume *worldLV,
+  G4int panelIndex,
+  G4int copyNumberBase,
+  const G4ThreeVector &hodoCenterHall,
+  const G4RotationMatrix &hodoRotationHall)
+{
+
   // The hodo wall rests against Panel 3; their centers should therefore differ
   // along the local wall-normal direction.  This first approximation is kept as
   // explicit variables because the item-8/channel interface will be refined
@@ -59,11 +141,11 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
   G4RotationMatrix *frameRotationHall =
     new G4RotationMatrix(hodoRotationHall * panel3LocalRotation);
 
-  frameAssembly->MakeImprint(worldLV,
-                             frameCenterHall,
-                             frameRotationHall,
-                             160000 + panelIndex * 100,
-                             fCheckOverlaps);
+  assembly->MakeImprint(worldLV,
+                        frameCenterHall,
+                        frameRotationHall,
+                        copyNumberBase + panelIndex * 100,
+                        fCheckOverlaps);
 }
 
 
