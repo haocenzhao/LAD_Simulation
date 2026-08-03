@@ -55,6 +55,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStand(
   BuildSingleStandHorizontalMountingPlates(standAssembly, Materials);
   BuildSingleStandGussetMountingPlates(standAssembly, Materials);
   BuildSingleStandHorizontalWeldment(standAssembly, Materials);
+  BuildSingleStandGussetWeldments(standAssembly, Materials);
 
   // The stand is drawn with negative local Y pointing below Panel 3.  Rotate
   // the completed stand in the Panel 3 frame so that the subsequent Panel 3
@@ -491,6 +492,109 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalGussetMountin
 
   standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
   standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandGussetWeldments(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  BuildSingleStandGussetEndPlates(standAssembly, Materials);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandGussetEndPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 11: two 1/2 x 6.5 x 6 inch ASTM A36 end plates
+  // per gusset weldment.  One end plate attaches to the vertical-tube item 12;
+  // the other is the same part rotated onto the horizontal-weldment item 12.
+  const G4double endPlateThickness = 0.5 * inch;
+  const G4double endPlateSizeLong = 6.5 * inch;
+  const G4double endPlateSizeZ = 6.0 * inch;
+
+  const G4double standHeight = 47.25 * inch;
+  const G4double verticalTubeOuter = 6.0 * inch;
+  const G4double item12Thickness = 1.0 * inch;
+  const G4double verticalItem12BottomHeight = 9.75 * inch;
+  const G4double horizontalPlateBottomHeight = 28.125 * inch;
+  const G4double horizontalPlateHeight = 10.0 * inch;
+  const G4double horizontalWeldmentLength = 90.50 * inch;
+  const G4double horizontalItem12EndToCenter = 16.125 * inch;
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+  const G4double panel3LegInnerClearance = 94.50 * inch;
+  const G4double panel3LegOuterX = 4.0 * inch;
+
+  const G4double verticalTubeCenterX =
+    0.5 * (panel3LegInnerClearance + panel3LegOuterX);
+  const G4double verticalEndPlateCenterX =
+    verticalTubeCenterX -
+    0.5 * verticalTubeOuter -
+    item12Thickness -
+    0.5 * endPlateThickness;
+
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double bottomPlateTopSurfaceY =
+    panel3BottomPadSurfaceY - standHeight;
+  const G4double verticalEndPlateCenterY =
+    bottomPlateTopSurfaceY +
+    verticalItem12BottomHeight +
+    0.5 * endPlateSizeLong;
+
+  const G4double horizontalTubeCenterY =
+    bottomPlateTopSurfaceY +
+    horizontalPlateBottomHeight +
+    0.5 * horizontalPlateHeight;
+  const G4double horizontalItem12CenterY =
+    horizontalTubeCenterY -
+    0.5 * verticalTubeOuter -
+    0.5 * item12Thickness;
+  const G4double horizontalEndPlateCenterY =
+    horizontalItem12CenterY -
+    0.5 * item12Thickness -
+    0.5 * endPlateThickness;
+  const G4double horizontalEndPlateCenterX =
+    0.5 * horizontalWeldmentLength - horizontalItem12EndToCenter;
+
+  // Canonical item 11 orientation: thickness along X, 6.5 inches along Y.
+  G4Box *plateSolid = new G4Box("SingleStandGussetEndPlateSolid",
+                                endPlateThickness / 2.0,
+                                endPlateSizeLong / 2.0,
+                                endPlateSizeZ / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "SingleStandGussetEndPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.24, 0.24, 0.24)));
+
+  G4ThreeVector leftVerticalPlatePosition(-verticalEndPlateCenterX,
+                                          verticalEndPlateCenterY,
+                                          0.0);
+  G4ThreeVector rightVerticalPlatePosition(verticalEndPlateCenterX,
+                                           verticalEndPlateCenterY,
+                                           0.0);
+  standAssembly->AddPlacedVolume(plateLV, leftVerticalPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightVerticalPlatePosition, nullptr);
+
+  G4RotationMatrix *horizontalPlateRotation = new G4RotationMatrix();
+  horizontalPlateRotation->rotateZ(90.0 * deg);
+
+  G4ThreeVector leftHorizontalPlatePosition(-horizontalEndPlateCenterX,
+                                            horizontalEndPlateCenterY,
+                                            0.0);
+  G4ThreeVector rightHorizontalPlatePosition(horizontalEndPlateCenterX,
+                                             horizontalEndPlateCenterY,
+                                             0.0);
+  standAssembly->AddPlacedVolume(plateLV,
+                                 leftHorizontalPlatePosition,
+                                 horizontalPlateRotation);
+  standAssembly->AddPlacedVolume(plateLV,
+                                 rightHorizontalPlatePosition,
+                                 horizontalPlateRotation);
 }
 
 

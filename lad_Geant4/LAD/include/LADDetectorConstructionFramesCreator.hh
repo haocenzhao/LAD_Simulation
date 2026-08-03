@@ -32,6 +32,10 @@ void BuildSingleStandHorizontalEndPlates(G4AssemblyVolume *standAssembly,
                                          LADMaterials *Materials);
 void BuildSingleStandHorizontalGussetMountingPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
+void BuildSingleStandGussetWeldments(G4AssemblyVolume *standAssembly,
+                                     LADMaterials *Materials);
+void BuildSingleStandGussetEndPlates(G4AssemblyVolume *standAssembly,
+                                     LADMaterials *Materials);
 void PlacePanel3LocalAssembly(G4AssemblyVolume *assembly,
                               G4LogicalVolume *worldLV,
                               G4int panelIndex,
