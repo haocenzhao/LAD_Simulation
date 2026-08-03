@@ -54,6 +54,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStand(
   BuildSingleStandBottomPlates(standAssembly, Materials);
   BuildSingleStandHorizontalMountingPlates(standAssembly, Materials);
   BuildSingleStandGussetMountingPlates(standAssembly, Materials);
+  BuildSingleStandHorizontalWeldment(standAssembly, Materials);
 
   // The stand is drawn with negative local Y pointing below Panel 3.  Rotate
   // the completed stand in the Panel 3 frame so that the subsequent Panel 3
@@ -319,6 +320,175 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetMountingPlates(
   G4ThreeVector rightPlatePosition(tubeCenterX - plateOffsetX,
                                    plateCenterY,
                                    0.0);
+
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalWeldment(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  BuildSingleStandHorizontalTube(standAssembly, Materials);
+  BuildSingleStandHorizontalEndPlates(standAssembly, Materials);
+  BuildSingleStandHorizontalGussetMountingPlates(standAssembly, Materials);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalTube(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 5: 6 x 6 x 3/8 inch wall ASTM A500 Grade B
+  // tube.  The 89-inch tube spans between the two 3/4-inch end plates in the
+  // 90.50-inch horizontal weldment.
+  const G4double weldmentLength = 90.50 * inch;
+  const G4double endPlateThickness = 0.75 * inch;
+  const G4double tubeLength =
+    weldmentLength - 2.0 * endPlateThickness;
+  const G4double tubeOuter = 6.0 * inch;
+  const G4double tubeWall = 0.375 * inch;
+  const G4double tubeInner = tubeOuter - 2.0 * tubeWall;
+
+  const G4double standHeight = 47.25 * inch;
+  const G4double horizontalPlateBottomHeight = 28.125 * inch;
+  const G4double horizontalPlateHeight = 10.0 * inch;
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double bottomPlateTopSurfaceY =
+    panel3BottomPadSurfaceY - standHeight;
+  const G4double tubeCenterY =
+    bottomPlateTopSurfaceY +
+    horizontalPlateBottomHeight +
+    0.5 * horizontalPlateHeight;
+
+  G4Box *tubeOuterSolid = new G4Box("SingleStandHorizontalTubeOuterSolid",
+                                    tubeLength / 2.0,
+                                    tubeOuter / 2.0,
+                                    tubeOuter / 2.0);
+
+  // Extend the cutter slightly beyond both tube ends to avoid coplanar
+  // surfaces in the Boolean subtraction.
+  G4Box *tubeInnerSolid = new G4Box("SingleStandHorizontalTubeInnerSolid",
+                                    tubeLength / 2.0 + 0.1 * mm,
+                                    tubeInner / 2.0,
+                                    tubeInner / 2.0);
+
+  G4SubtractionSolid *tubeSolid =
+    new G4SubtractionSolid("SingleStandHorizontalTubeSolid",
+                           tubeOuterSolid,
+                           tubeInnerSolid,
+                           nullptr,
+                           G4ThreeVector());
+
+  G4LogicalVolume *tubeLV =
+    new G4LogicalVolume(tubeSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "SingleStandHorizontalTubeLV");
+  tubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.25, 0.25, 0.25)));
+
+  standAssembly->AddPlacedVolume(tubeLV,
+                                 G4ThreeVector(0.0, tubeCenterY, 0.0),
+                                 nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalEndPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 9: two 3/4 x 10 x 6 inch ASTM A36 end plates.
+  const G4double weldmentLength = 90.50 * inch;
+  const G4double plateThicknessX = 0.75 * inch;
+  const G4double plateHeightY = 10.0 * inch;
+  const G4double plateSizeZ = 6.0 * inch;
+
+  const G4double standHeight = 47.25 * inch;
+  const G4double horizontalPlateBottomHeight = 28.125 * inch;
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double bottomPlateTopSurfaceY =
+    panel3BottomPadSurfaceY - standHeight;
+  const G4double plateCenterY =
+    bottomPlateTopSurfaceY +
+    horizontalPlateBottomHeight +
+    0.5 * plateHeightY;
+  const G4double plateCenterX =
+    0.5 * (weldmentLength - plateThicknessX);
+
+  G4Box *plateSolid = new G4Box("SingleStandHorizontalEndPlateSolid",
+                                plateThicknessX / 2.0,
+                                plateHeightY / 2.0,
+                                plateSizeZ / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "SingleStandHorizontalEndPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.22, 0.22, 0.22)));
+
+  G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
+  G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
+
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalGussetMountingPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 12: two 6.5 x 1 x 6 inch ASTM A36 plates on the
+  // underside of the horizontal tube.  Each center is 16.125 inches from the
+  // nearest outer end of the horizontal weldment.
+  const G4double weldmentLength = 90.50 * inch;
+  const G4double plateEndToCenter = 16.125 * inch;
+  const G4double plateSizeX = 6.5 * inch;
+  const G4double plateThicknessY = 1.0 * inch;
+  const G4double plateSizeZ = 6.0 * inch;
+  const G4double tubeOuter = 6.0 * inch;
+
+  const G4double standHeight = 47.25 * inch;
+  const G4double horizontalPlateBottomHeight = 28.125 * inch;
+  const G4double horizontalPlateHeight = 10.0 * inch;
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double bottomPlateTopSurfaceY =
+    panel3BottomPadSurfaceY - standHeight;
+  const G4double tubeCenterY =
+    bottomPlateTopSurfaceY +
+    horizontalPlateBottomHeight +
+    0.5 * horizontalPlateHeight;
+  const G4double plateCenterY =
+    tubeCenterY - 0.5 * tubeOuter - 0.5 * plateThicknessY;
+  const G4double plateCenterX =
+    0.5 * weldmentLength - plateEndToCenter;
+
+  G4Box *plateSolid =
+    new G4Box("SingleStandHorizontalGussetMountingPlateSolid",
+              plateSizeX / 2.0,
+              plateThicknessY / 2.0,
+              plateSizeZ / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "SingleStandHorizontalGussetMountingPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.22, 0.22, 0.22)));
+
+  G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
+  G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
 
   standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
   standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
