@@ -18,6 +18,8 @@ void BuildSingleStandTopPlates(G4AssemblyVolume *standAssembly,
                                LADMaterials *Materials);
 void BuildSingleStandVerticalTubes(G4AssemblyVolume *standAssembly,
                                    LADMaterials *Materials);
+void BuildSingleStandBottomPlates(G4AssemblyVolume *standAssembly,
+                                  LADMaterials *Materials);
 void PlacePanel3LocalAssembly(G4AssemblyVolume *assembly,
                               G4LogicalVolume *worldLV,
                               G4int panelIndex,

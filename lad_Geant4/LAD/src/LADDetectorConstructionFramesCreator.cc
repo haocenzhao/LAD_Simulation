@@ -51,6 +51,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStand(
 
   BuildSingleStandTopPlates(standAssembly, Materials);
   BuildSingleStandVerticalTubes(standAssembly, Materials);
+  BuildSingleStandBottomPlates(standAssembly, Materials);
 
   // The stand is drawn with negative local Y pointing below Panel 3.  Rotate
   // the completed stand in the Panel 3 frame so that the subsequent Panel 3
@@ -172,6 +173,48 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandVerticalTubes(
 
   standAssembly->AddPlacedVolume(tubeLV, leftTubePosition, nullptr);
   standAssembly->AddPlacedVolume(tubeLV, rightTubePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandBottomPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 14: one 22 x 12 x 1 inch ASTM A36 structure
+  // mounting plate per support leg.  The 22-inch dimension runs along local Z.
+  const G4double plateSizeX = 12.0 * inch;
+  const G4double plateThickness = 1.0 * inch;
+  const G4double plateSizeZ = 22.0 * inch;
+
+  const G4double standHeight = 47.25 * inch;
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+  const G4double panel3LegInnerClearance = 94.50 * inch;
+  const G4double panel3LegOuterX = 4.0 * inch;
+
+  const G4double plateCenterX =
+    0.5 * (panel3LegInnerClearance + panel3LegOuterX);
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double plateCenterY =
+    panel3BottomPadSurfaceY - standHeight + 0.5 * plateThickness;
+
+  G4Box *plateSolid = new G4Box("SingleStandBottomPlateSolid",
+                                plateSizeX / 2.0,
+                                plateThickness / 2.0,
+                                plateSizeZ / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "SingleStandBottomPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.20, 0.20, 0.20)));
+
+  G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
+  G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
+
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
 }
 
 
