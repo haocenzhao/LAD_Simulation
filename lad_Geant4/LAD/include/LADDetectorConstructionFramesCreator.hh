@@ -16,6 +16,8 @@ void BuildSingleStand(G4LogicalVolume *worldLV, LADMaterials *Materials,
                       const G4RotationMatrix &hodoRotationHall);
 void BuildSingleStandTopPlates(G4AssemblyVolume *standAssembly,
                                LADMaterials *Materials);
+void BuildSingleStandVerticalTubes(G4AssemblyVolume *standAssembly,
+                                   LADMaterials *Materials);
 void PlacePanel3LocalAssembly(G4AssemblyVolume *assembly,
                               G4LogicalVolume *worldLV,
                               G4int panelIndex,
