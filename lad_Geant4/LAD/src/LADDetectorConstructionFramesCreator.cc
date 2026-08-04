@@ -129,7 +129,9 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandVerticalTubes(
 
   const G4double standHeight = 47.25 * inch;
   const G4double topPlateThickness = 1.0 * inch;
-  const G4double tubeLength = standHeight - topPlateThickness;
+  const G4double bottomPlateThickness = 1.0 * inch;
+  const G4double tubeLength =
+    standHeight - topPlateThickness - bottomPlateThickness;
 
   const G4double panel3FrameHeight = 216.0 * inch;
   const G4double panel3PadThickness = 0.75 * inch;
@@ -201,7 +203,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandBottomPlates(
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
   const G4double plateCenterY =
-    panel3BottomPadSurfaceY - standHeight - 0.5 * plateThickness;
+    panel3BottomPadSurfaceY - standHeight + 0.5 * plateThickness;
 
   G4Box *plateSolid = new G4Box("SingleStandBottomPlateSolid",
                                 plateSizeX / 2.0,
@@ -240,12 +242,12 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandBraceTubes(
   const G4double braceCenterZ = 4.799697 * inch;
 
   const G4double verticalTubeOuter = 6.0 * inch;
-  const G4double verticalTubeLength = 46.25 * inch;
-  const G4double verticalTubeCenterY = -132.875 * inch;
+  const G4double verticalTubeLength = 45.25 * inch;
+  const G4double verticalTubeCenterY = -132.375 * inch;
   const G4double bottomPlateSizeX = 12.0 * inch;
   const G4double bottomPlateThickness = 1.0 * inch;
   const G4double bottomPlateSizeZ = 22.0 * inch;
-  const G4double bottomPlateCenterY = -156.5 * inch;
+  const G4double bottomPlateCenterY = -155.5 * inch;
 
   G4Box *braceOuterSolid = new G4Box("SingleStandBraceTubeOuterSolid",
                                      braceOuter / 2.0,
@@ -436,10 +438,10 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalMountingPlate
     0.5 * tubeOuter + 0.5 * plateThicknessX;
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
-  const G4double bottomPlateTopSurfaceY =
+  const G4double bottomPlateBottomSurfaceY =
     panel3BottomPadSurfaceY - standHeight;
   const G4double plateCenterY =
-    bottomPlateTopSurfaceY + plateBottomHeight + 0.5 * plateHeightY;
+    bottomPlateBottomSurfaceY + plateBottomHeight + 0.5 * plateHeightY;
 
   G4Box *plateSolid =
     new G4Box("SingleStandHorizontalMountingPlateSolid",
@@ -489,10 +491,10 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetMountingPlates(
     0.5 * tubeOuter + 0.5 * plateThicknessX;
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
-  const G4double bottomPlateTopSurfaceY =
+  const G4double bottomPlateBottomSurfaceY =
     panel3BottomPadSurfaceY - standHeight;
   const G4double plateCenterY =
-    bottomPlateTopSurfaceY + plateBottomHeight + 0.5 * plateHeightY;
+    bottomPlateBottomSurfaceY + plateBottomHeight + 0.5 * plateHeightY;
 
   G4Box *plateSolid =
     new G4Box("SingleStandGussetMountingPlateSolid",
@@ -551,10 +553,10 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalTube(
 
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
-  const G4double bottomPlateTopSurfaceY =
+  const G4double bottomPlateBottomSurfaceY =
     panel3BottomPadSurfaceY - standHeight;
   const G4double tubeCenterY =
-    bottomPlateTopSurfaceY +
+    bottomPlateBottomSurfaceY +
     horizontalPlateBottomHeight +
     0.5 * horizontalPlateHeight;
 
@@ -605,10 +607,10 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalEndPlates(
 
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
-  const G4double bottomPlateTopSurfaceY =
+  const G4double bottomPlateBottomSurfaceY =
     panel3BottomPadSurfaceY - standHeight;
   const G4double plateCenterY =
-    bottomPlateTopSurfaceY +
+    bottomPlateBottomSurfaceY +
     horizontalPlateBottomHeight +
     0.5 * plateHeightY;
   const G4double plateCenterX =
@@ -655,10 +657,10 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandHorizontalGussetMountin
 
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
-  const G4double bottomPlateTopSurfaceY =
+  const G4double bottomPlateBottomSurfaceY =
     panel3BottomPadSurfaceY - standHeight;
   const G4double tubeCenterY =
-    bottomPlateTopSurfaceY +
+    bottomPlateBottomSurfaceY +
     horizontalPlateBottomHeight +
     0.5 * horizontalPlateHeight;
   const G4double plateCenterY =
@@ -729,15 +731,15 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetEndPlates(
 
   const G4double panel3BottomPadSurfaceY =
     -0.5 * panel3FrameHeight - panel3PadThickness;
-  const G4double bottomPlateTopSurfaceY =
+  const G4double bottomPlateBottomSurfaceY =
     panel3BottomPadSurfaceY - standHeight;
   const G4double verticalEndPlateCenterY =
-    bottomPlateTopSurfaceY +
+    bottomPlateBottomSurfaceY +
     verticalItem12BottomHeight +
     0.5 * endPlateSizeLong;
 
   const G4double horizontalTubeCenterY =
-    bottomPlateTopSurfaceY +
+    bottomPlateBottomSurfaceY +
     horizontalPlateBottomHeight +
     0.5 * horizontalPlateHeight;
   const G4double horizontalItem12CenterY =
