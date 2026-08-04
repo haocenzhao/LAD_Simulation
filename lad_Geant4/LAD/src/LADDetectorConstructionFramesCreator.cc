@@ -49,8 +49,9 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
   // before applying the common double-wall alignment correction.
   G4AssemblyVolume *standAssembly = new G4AssemblyVolume();
 
-  BuildDoubleStandTopAttachmentPlates(standAssembly, Materials);
+  BuildDoubleStandItem11DetectorAttachmentPlates(standAssembly, Materials);
   BuildDoubleStandLongTube(standAssembly, Materials);
+  BuildDoubleStandItem10AttachmentPlates(standAssembly, Materials);
 
   // Match the single-wall construction: draw the stand below Panel 3, then
   // rotate the completed stand before the Panel 3 drawing-orientation change.
@@ -67,13 +68,13 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
 }
 
 
-void LADDetectorConstructionHodoCreator::BuildDoubleStandTopAttachmentPlates(
+void LADDetectorConstructionHodoCreator::BuildDoubleStandItem11DetectorAttachmentPlates(
   G4AssemblyVolume *standAssembly,
   LADMaterials *Materials)
 {
-  // Drawing 67506-00010, item 10: two 28 x 12 x 3/4-inch ASTM A36
-  // attachment plates.  Local Z is centered between the two Panel 3 layers;
-  // each plate spans both bottom pads without overlapping them.
+  // Drawing 67506-00010, item 11: two 28 x 12 x 3/4-inch ASTM A36 detector
+  // attachment plates.  Each plate touches the bottom pads of both Panel 3
+  // layers without occupying the same volume.
   const G4double plateSizeX = 12.0 * inch;
   const G4double plateThicknessY = 0.75 * inch;
   const G4double plateSizeZ = 28.0 * inch;
@@ -91,7 +92,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandTopAttachmentPlates(
     panel3BottomPadSurfaceY - 0.5 * plateThicknessY;
 
   G4Box *plateSolid =
-    new G4Box("DoubleStandTopAttachmentPlateSolid",
+    new G4Box("DoubleStandItem11DetectorAttachmentPlateSolid",
               plateSizeX / 2.0,
               plateThicknessY / 2.0,
               plateSizeZ / 2.0);
@@ -99,7 +100,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandTopAttachmentPlates(
   G4LogicalVolume *plateLV =
     new G4LogicalVolume(plateSolid,
                         Materials->ASTM_A36,
-                        "DoubleStandTopAttachmentPlateLV");
+                        "DoubleStandItem11DetectorAttachmentPlateLV");
   plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.20, 0.20, 0.20)));
 
   G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
@@ -174,6 +175,54 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandLongTube(
 
   G4ThreeVector item5Position(0.0, -112.50 * inch, 0.0);
   standAssembly->AddPlacedVolume(item5LV, item5Position, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandItem10AttachmentPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010, item 10: the horizontal weldment uses two attachment
+  // plates below item 5, and each of the two vertical weldments uses one more
+  // directly above item 7.  All four have the same dimensions and X/Z centers.
+  const G4double plateSizeX = 12.0 * inch;
+  const G4double plateThicknessY = 0.75 * inch;
+  const G4double plateSizeZ = 28.0 * inch;
+  const G4double plateCenterX = 49.25 * inch;
+  const G4double item5BottomSurfaceY = -115.50 * inch;
+  const G4double horizontalPlateCenterY =
+    item5BottomSurfaceY - 0.5 * plateThicknessY;
+  const G4double verticalPlateCenterY =
+    horizontalPlateCenterY - plateThicknessY;
+
+  G4Box *plateSolid =
+    new G4Box("DoubleStandItem10AttachmentPlateSolid",
+              plateSizeX / 2.0,
+              plateThicknessY / 2.0,
+              plateSizeZ / 2.0);
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "DoubleStandItem10AttachmentPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.20, 0.20, 0.20)));
+
+  G4ThreeVector leftHorizontalPlatePosition(
+    -plateCenterX, horizontalPlateCenterY, 0.0);
+  G4ThreeVector rightHorizontalPlatePosition(
+    plateCenterX, horizontalPlateCenterY, 0.0);
+  G4ThreeVector leftVerticalPlatePosition(
+    -plateCenterX, verticalPlateCenterY, 0.0);
+  G4ThreeVector rightVerticalPlatePosition(
+    plateCenterX, verticalPlateCenterY, 0.0);
+
+  standAssembly->AddPlacedVolume(
+    plateLV, leftHorizontalPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(
+    plateLV, rightHorizontalPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(
+    plateLV, leftVerticalPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(
+    plateLV, rightVerticalPlatePosition, nullptr);
 }
 
 
