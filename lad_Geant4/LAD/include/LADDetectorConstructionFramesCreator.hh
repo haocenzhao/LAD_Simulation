@@ -16,6 +16,8 @@ void BuildDoubleStand(G4LogicalVolume *worldLV, LADMaterials *Materials,
                       const G4RotationMatrix &hodoRotationHall);
 void BuildDoubleStandTopAttachmentPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
+void BuildDoubleStandLongTube(G4AssemblyVolume *standAssembly,
+                              LADMaterials *Materials);
 void BuildSingleStand(G4LogicalVolume *worldLV, LADMaterials *Materials,
                       G4int panelIndex,
                       const G4ThreeVector &hodoCenterHall,

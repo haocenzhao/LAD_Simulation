@@ -50,6 +50,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
   G4AssemblyVolume *standAssembly = new G4AssemblyVolume();
 
   BuildDoubleStandTopAttachmentPlates(standAssembly, Materials);
+  BuildDoubleStandLongTube(standAssembly, Materials);
 
   // Match the single-wall construction: draw the stand below Panel 3, then
   // rotate the completed stand before the Panel 3 drawing-orientation change.
@@ -106,6 +107,73 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandTopAttachmentPlates(
 
   standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
   standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandLongTube(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010, item 5: one closed rectangular tube made from a
+  // 6-inch-wide rectangular ring with a constant 3/8-inch wall.
+  const G4double outerSizeX = 104.50 * inch;
+  const G4double outerSizeY = 6.0 * inch;
+  const G4double outerSizeZ = 22.0 * inch;
+  const G4double openingSizeX = 92.50 * inch;
+  const G4double openingSizeZ = 10.0 * inch;
+  const G4double wallThickness = 0.375 * inch;
+  const G4double booleanTolerance = 0.01 * inch;
+
+  G4Box *outerBlock =
+    new G4Box("DoubleStandItem5OuterBlock",
+              outerSizeX / 2.0,
+              outerSizeY / 2.0,
+              outerSizeZ / 2.0);
+  G4Box *centralOpening =
+    new G4Box("DoubleStandItem5CentralOpening",
+              openingSizeX / 2.0,
+              outerSizeY / 2.0 + booleanTolerance,
+              openingSizeZ / 2.0);
+  G4SubtractionSolid *solidRing =
+    new G4SubtractionSolid("DoubleStandItem5SolidRing",
+                           outerBlock,
+                           centralOpening);
+
+  // The hollowing cutter is a second rectangular ring with every surface
+  // offset inward by the specified wall thickness.
+  const G4double cutterOuterSizeX = outerSizeX - 2.0 * wallThickness;
+  const G4double cutterOuterSizeY = outerSizeY - 2.0 * wallThickness;
+  const G4double cutterOuterSizeZ = outerSizeZ - 2.0 * wallThickness;
+  const G4double cutterOpeningSizeX = openingSizeX + 2.0 * wallThickness;
+  const G4double cutterOpeningSizeZ = openingSizeZ + 2.0 * wallThickness;
+
+  G4Box *cutterOuterBlock =
+    new G4Box("DoubleStandItem5CutterOuterBlock",
+              cutterOuterSizeX / 2.0,
+              cutterOuterSizeY / 2.0,
+              cutterOuterSizeZ / 2.0);
+  G4Box *cutterCentralOpening =
+    new G4Box("DoubleStandItem5CutterCentralOpening",
+              cutterOpeningSizeX / 2.0,
+              cutterOuterSizeY / 2.0 + booleanTolerance,
+              cutterOpeningSizeZ / 2.0);
+  G4SubtractionSolid *hollowingCutter =
+    new G4SubtractionSolid("DoubleStandItem5HollowingCutter",
+                           cutterOuterBlock,
+                           cutterCentralOpening);
+
+  G4SubtractionSolid *item5Solid =
+    new G4SubtractionSolid("DoubleStandItem5Solid",
+                           solidRing,
+                           hollowingCutter);
+  G4LogicalVolume *item5LV =
+    new G4LogicalVolume(item5Solid,
+                        Materials->ASTM_A500_GradeB,
+                        "DoubleStandItem5LV");
+  item5LV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
+
+  G4ThreeVector item5Position(0.0, -112.50 * inch, 0.0);
+  standAssembly->AddPlacedVolume(item5LV, item5Position, nullptr);
 }
 
 
