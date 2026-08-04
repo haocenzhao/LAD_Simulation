@@ -36,6 +36,8 @@ void BuildSingleStandGussetWeldments(G4AssemblyVolume *standAssembly,
                                      LADMaterials *Materials);
 void BuildSingleStandGussetEndPlates(G4AssemblyVolume *standAssembly,
                                      LADMaterials *Materials);
+void BuildSingleStandGussetTubes(G4AssemblyVolume *standAssembly,
+                                 LADMaterials *Materials);
 void PlacePanel3LocalAssembly(G4AssemblyVolume *assembly,
                               G4LogicalVolume *worldLV,
                               G4int panelIndex,

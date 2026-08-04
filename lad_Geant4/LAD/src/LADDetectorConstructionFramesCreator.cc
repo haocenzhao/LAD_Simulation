@@ -500,6 +500,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetWeldments(
   LADMaterials *Materials)
 {
   BuildSingleStandGussetEndPlates(standAssembly, Materials);
+  BuildSingleStandGussetTubes(standAssembly, Materials);
 }
 
 
@@ -595,6 +596,199 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetEndPlates(
   standAssembly->AddPlacedVolume(plateLV,
                                  rightHorizontalPlatePosition,
                                  horizontalPlateRotation);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 8.  Model the 4-inch outside dimension as a
+  // circular 1/4-inch-wall tube.  Trim the effective axis-length tube against
+  // the mating item 12/item 11 plates and vertical support tube before placing
+  // it in the stand assembly.
+  const G4double tubeLength = 21.743533521 * inch;
+  const G4double tubeOuterRadius = 2.0 * inch;
+  const G4double tubeWall = 0.25 * inch;
+  const G4double tubeInnerRadius = tubeOuterRadius - tubeWall;
+  const G4double cutterClearance = 0.1 * mm;
+
+  const G4double item12Thickness = 1.0 * inch;
+  const G4double item12LongSize = 6.5 * inch;
+  const G4double plateSizeZ = 6.0 * inch;
+  const G4double item11Thickness = 0.5 * inch;
+  const G4double verticalTubeOuter = 6.0 * inch;
+  const G4double verticalTubeLength = 46.25 * inch;
+
+  const G4double verticalTubeCenterX = 49.25 * inch;
+  const G4double verticalTubeCenterY = -132.875 * inch;
+  const G4double verticalItem12CenterX = 45.75 * inch;
+  const G4double verticalItem12CenterY = -143.0 * inch;
+  const G4double verticalItem11CenterX = 45.0 * inch;
+  const G4double verticalItem11CenterY = -143.0 * inch;
+  const G4double horizontalItem12CenterX = 29.125 * inch;
+  const G4double horizontalItem12CenterY = -126.375 * inch;
+  const G4double horizontalItem11CenterX = 29.125 * inch;
+  const G4double horizontalItem11CenterY = -127.125 * inch;
+
+  const G4double gussetTubeCenterX = 36.976714 * inch;
+  const G4double gussetTubeCenterY = -135.148286 * inch;
+  const G4double inverseSqrtTwo = 1.0 / std::sqrt(2.0);
+
+  G4Tubs *tubeBaseSolid = new G4Tubs("SingleStandGussetTubeBaseSolid",
+                                     tubeInnerRadius,
+                                     tubeOuterRadius,
+                                     tubeLength / 2.0,
+                                     0.0,
+                                     360.0 * deg);
+
+  G4Box *verticalItem12Cutter =
+    new G4Box("SingleStandGussetVerticalItem12Cutter",
+              item12Thickness / 2.0 + cutterClearance,
+              item12LongSize / 2.0 + cutterClearance,
+              plateSizeZ / 2.0 + cutterClearance);
+  G4Box *horizontalItem12Cutter =
+    new G4Box("SingleStandGussetHorizontalItem12Cutter",
+              item12LongSize / 2.0 + cutterClearance,
+              item12Thickness / 2.0 + cutterClearance,
+              plateSizeZ / 2.0 + cutterClearance);
+  G4Box *item11Cutter =
+    new G4Box("SingleStandGussetItem11Cutter",
+              item11Thickness / 2.0 + cutterClearance,
+              item12LongSize / 2.0 + cutterClearance,
+              plateSizeZ / 2.0 + cutterClearance);
+  G4Box *verticalTubeCutter =
+    new G4Box("SingleStandGussetVerticalTubeCutter",
+              verticalTubeOuter / 2.0 + cutterClearance,
+              verticalTubeLength / 2.0 + cutterClearance,
+              verticalTubeOuter / 2.0 + cutterClearance);
+
+  G4RotationMatrix identityRotation;
+  G4RotationMatrix horizontalItem11Rotation;
+  horizontalItem11Rotation.rotateZ(90.0 * deg);
+
+  auto MakeCutTube =
+    [&](const G4String &name,
+        G4double sideSign,
+        const G4ThreeVector &tubePosition,
+        const G4ThreeVector &tubeAxis) -> G4SubtractionSolid *
+    {
+      G4RotationMatrix tubeRotation;
+      tubeRotation.rotateUz(tubeAxis);
+
+      G4RotationMatrix inverseTubeRotation(tubeRotation);
+      inverseTubeRotation.invert();
+
+      auto ToTubeFrame =
+        [&](const G4ThreeVector &cutterPosition,
+            const G4RotationMatrix &cutterRotation) -> G4Transform3D
+        {
+          G4RotationMatrix rotationInTubeFrame =
+            inverseTubeRotation * cutterRotation;
+          G4ThreeVector positionInTubeFrame =
+            inverseTubeRotation * (cutterPosition - tubePosition);
+          return G4Transform3D(rotationInTubeFrame, positionInTubeFrame);
+        };
+
+      G4ThreeVector verticalItem12Position(
+        sideSign * verticalItem12CenterX,
+        verticalItem12CenterY,
+        0.0);
+      G4ThreeVector horizontalItem12Position(
+        sideSign * horizontalItem12CenterX,
+        horizontalItem12CenterY,
+        0.0);
+      G4ThreeVector verticalItem11Position(
+        sideSign * verticalItem11CenterX,
+        verticalItem11CenterY,
+        0.0);
+      G4ThreeVector horizontalItem11Position(
+        sideSign * horizontalItem11CenterX,
+        horizontalItem11CenterY,
+        0.0);
+      G4ThreeVector verticalTubePosition(sideSign * verticalTubeCenterX,
+                                         verticalTubeCenterY,
+                                         0.0);
+
+      G4Transform3D verticalItem12Transform =
+        ToTubeFrame(verticalItem12Position, identityRotation);
+      G4Transform3D horizontalItem12Transform =
+        ToTubeFrame(horizontalItem12Position, identityRotation);
+      G4Transform3D verticalItem11Transform =
+        ToTubeFrame(verticalItem11Position, identityRotation);
+      G4Transform3D horizontalItem11Transform =
+        ToTubeFrame(horizontalItem11Position, horizontalItem11Rotation);
+      G4Transform3D verticalTubeTransform =
+        ToTubeFrame(verticalTubePosition, identityRotation);
+
+      G4SubtractionSolid *cutVerticalItem12 =
+        new G4SubtractionSolid(name + "CutVerticalItem12",
+                               tubeBaseSolid,
+                               verticalItem12Cutter,
+                               verticalItem12Transform);
+      G4SubtractionSolid *cutHorizontalItem12 =
+        new G4SubtractionSolid(name + "CutHorizontalItem12",
+                               cutVerticalItem12,
+                               horizontalItem12Cutter,
+                               horizontalItem12Transform);
+      G4SubtractionSolid *cutVerticalItem11 =
+        new G4SubtractionSolid(name + "CutVerticalItem11",
+                               cutHorizontalItem12,
+                               item11Cutter,
+                               verticalItem11Transform);
+      G4SubtractionSolid *cutHorizontalItem11 =
+        new G4SubtractionSolid(name + "CutHorizontalItem11",
+                               cutVerticalItem11,
+                               item11Cutter,
+                               horizontalItem11Transform);
+      return new G4SubtractionSolid(name + "Solid",
+                                    cutHorizontalItem11,
+                                    verticalTubeCutter,
+                                    verticalTubeTransform);
+    };
+
+  G4ThreeVector leftTubePosition(-gussetTubeCenterX,
+                                 gussetTubeCenterY,
+                                 0.0);
+  G4ThreeVector rightTubePosition(gussetTubeCenterX,
+                                  gussetTubeCenterY,
+                                  0.0);
+  G4ThreeVector leftTubeAxis(inverseSqrtTwo, inverseSqrtTwo, 0.0);
+  G4ThreeVector rightTubeAxis(-inverseSqrtTwo, inverseSqrtTwo, 0.0);
+
+  G4SubtractionSolid *leftTubeSolid =
+    MakeCutTube("SingleStandLeftGussetTube",
+                -1.0,
+                leftTubePosition,
+                leftTubeAxis);
+  G4SubtractionSolid *rightTubeSolid =
+    MakeCutTube("SingleStandRightGussetTube",
+                1.0,
+                rightTubePosition,
+                rightTubeAxis);
+
+  G4LogicalVolume *leftTubeLV =
+    new G4LogicalVolume(leftTubeSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "SingleStandLeftGussetTubeLV");
+  G4LogicalVolume *rightTubeLV =
+    new G4LogicalVolume(rightTubeSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "SingleStandRightGussetTubeLV");
+  leftTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
+  rightTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
+
+  G4RotationMatrix *leftTubeRotation = new G4RotationMatrix();
+  leftTubeRotation->rotateUz(leftTubeAxis);
+  G4RotationMatrix *rightTubeRotation = new G4RotationMatrix();
+  rightTubeRotation->rotateUz(rightTubeAxis);
+
+  standAssembly->AddPlacedVolume(leftTubeLV,
+                                 leftTubePosition,
+                                 leftTubeRotation);
+  standAssembly->AddPlacedVolume(rightTubeLV,
+                                 rightTubePosition,
+                                 rightTubeRotation);
 }
 
 
