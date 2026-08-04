@@ -255,13 +255,6 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandBraceTubes(
                                      braceInner / 2.0,
                                      braceInner / 2.0,
                                      braceLength / 2.0 + cutterClearance);
-  G4SubtractionSolid *braceHollowSolid =
-    new G4SubtractionSolid("SingleStandBraceTubeHollowSolid",
-                           braceOuterSolid,
-                           braceInnerSolid,
-                           nullptr,
-                           G4ThreeVector());
-
   G4Box *verticalTubeCutter =
     new G4Box("SingleStandBraceVerticalTubeCutter",
               verticalTubeOuter / 2.0 + cutterClearance,
@@ -320,13 +313,20 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandBraceTubes(
 
       G4SubtractionSolid *cutVerticalTube =
         new G4SubtractionSolid(name + "CutVerticalTube",
-                               braceHollowSolid,
+                               braceOuterSolid,
                                verticalTubeCutter,
                                verticalTubeTransform);
+      G4SubtractionSolid *cutBottomPlate =
+        new G4SubtractionSolid(name + "CutBottomPlate",
+                               cutVerticalTube,
+                               bottomPlateCutter,
+                               bottomPlateTransform);
+      G4ThreeVector innerCutterPosition;
       return new G4SubtractionSolid(name + "Solid",
-                                    cutVerticalTube,
-                                    bottomPlateCutter,
-                                    bottomPlateTransform);
+                                    cutBottomPlate,
+                                    braceInnerSolid,
+                                    nullptr,
+                                    innerCutterPosition);
     };
 
   const G4double sinBraceAngle = std::sin(braceAngle);
@@ -840,13 +840,6 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
                                     tubeInnerInPlane / 2.0,
                                     tubeInnerZ / 2.0,
                                     tubeLength / 2.0 + cutterClearance);
-  G4SubtractionSolid *tubeHollowSolid =
-    new G4SubtractionSolid("SingleStandGussetTubeHollowSolid",
-                           tubeOuterSolid,
-                           tubeInnerSolid,
-                           nullptr,
-                           G4ThreeVector());
-
   G4Box *verticalItem12Cutter =
     new G4Box("SingleStandGussetVerticalItem12Cutter",
               item12Thickness / 2.0 + cutterClearance,
@@ -945,7 +938,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
 
       G4SubtractionSolid *cutVerticalItem12 =
         new G4SubtractionSolid(name + "CutVerticalItem12",
-                               tubeHollowSolid,
+                               tubeOuterSolid,
                                verticalItem12Cutter,
                                verticalItem12Transform);
       G4SubtractionSolid *cutHorizontalItem12 =
@@ -968,10 +961,17 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
                                cutHorizontalItem11,
                                verticalTubeCutter,
                                verticalTubeTransform);
+      G4SubtractionSolid *cutHorizontalTube =
+        new G4SubtractionSolid(name + "CutHorizontalTube",
+                               cutVerticalTube,
+                               horizontalTubeCutter,
+                               horizontalTubeTransform);
+      G4ThreeVector innerCutterPosition;
       return new G4SubtractionSolid(name + "Solid",
-                                    cutVerticalTube,
-                                    horizontalTubeCutter,
-                                    horizontalTubeTransform);
+                                    cutHorizontalTube,
+                                    tubeInnerSolid,
+                                    nullptr,
+                                    innerCutterPosition);
     };
 
   G4ThreeVector leftTubePosition(-gussetTubeCenterX,
