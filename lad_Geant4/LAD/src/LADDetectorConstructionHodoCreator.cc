@@ -146,6 +146,21 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
     {
       if(ww>1) SubWalls = 1; // because we have 2 double walls and 1 single.
       //Maybe a while loop could be more efficient
+
+      // A double-wall stand is one rigid structure, so both of its panels must
+      // retain their nominal relative pose.  Apply the component-wise average
+      // alignment correction to both layers.  The single wall keeps its own
+      // layer-0 correction.
+      G4ThreeVector wallAlignmentShift = Variables->hodoShift[ww][0];
+      G4ThreeVector wallAlignmentRotate = Variables->hodoRotate[ww][0];
+      if (SubWalls == 2) {
+        wallAlignmentShift =
+          0.5 * (Variables->hodoShift[ww][0] +
+                 Variables->hodoShift[ww][1]);
+        wallAlignmentRotate =
+          0.5 * (Variables->hodoRotate[ww][0] +
+                 Variables->hodoRotate[ww][1]);
+      }
       
       G4cout<<"Wall "<<ww<<G4endl;
 
@@ -161,15 +176,15 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
 					  Materials->defaultMaterial, // its material
 					  "SciWall");                 // its name
 
-		  G4ThreeVector wallPosition =
-		    G4ThreeVector( vSeparationX[ww], vSeparationY[ww], vSeparationZ[ww]) +
-		    G4ThreeVector( vSpaceX[ww]*ws, vSpaceY[ww]*ws, vSpaceZ[ww]*ws ) +
-		    Variables->hodoShift[ww][ws];
+			  G4ThreeVector wallPosition =
+			    G4ThreeVector( vSeparationX[ww], vSeparationY[ww], vSeparationZ[ww]) +
+			    G4ThreeVector( vSpaceX[ww]*ws, vSpaceY[ww]*ws, vSpaceZ[ww]*ws ) +
+			    wallAlignmentShift;
 
-		  G4RotationMatrix alignRot;
-		  alignRot.rotateX(Variables->hodoRotate[ww][ws].x());
-		  alignRot.rotateY(Variables->hodoRotate[ww][ws].y());
-		  alignRot.rotateZ(Variables->hodoRotate[ww][ws].z());
+			  G4RotationMatrix alignRot;
+			  alignRot.rotateX(wallAlignmentRotate.x());
+			  alignRot.rotateY(wallAlignmentRotate.y());
+			  alignRot.rotateZ(wallAlignmentRotate.z());
 
 		  G4RotationMatrix wallRotation = alignRot * rmW[panelIndex];
 
