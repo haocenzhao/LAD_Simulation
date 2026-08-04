@@ -603,14 +603,15 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   G4AssemblyVolume *standAssembly,
   LADMaterials *Materials)
 {
-  // Drawing 67506-00006, item 8.  Model the 4-inch outside dimension as a
-  // circular 1/4-inch-wall tube.  Trim the effective axis-length tube against
-  // the mating item 12/item 11 plates and vertical support tube before placing
-  // it in the stand assembly.
+  // Drawing 67506-00006, item 8: 4 x 2 x 1/4-inch-wall rectangular tube.
+  // Trim the effective axis-length tube against the mating item 12/item 11
+  // plates and vertical support tube before placing it in the stand assembly.
   const G4double tubeLength = 21.743533521 * inch;
-  const G4double tubeOuterRadius = 2.0 * inch;
+  const G4double tubeOuterInPlane = 4.0 * inch;
+  const G4double tubeOuterZ = 2.0 * inch;
   const G4double tubeWall = 0.25 * inch;
-  const G4double tubeInnerRadius = tubeOuterRadius - tubeWall;
+  const G4double tubeInnerInPlane = tubeOuterInPlane - 2.0 * tubeWall;
+  const G4double tubeInnerZ = tubeOuterZ - 2.0 * tubeWall;
   const G4double cutterClearance = 0.1 * mm;
 
   const G4double item12Thickness = 1.0 * inch;
@@ -635,12 +636,22 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   const G4double gussetTubeCenterY = -135.148286 * inch;
   const G4double inverseSqrtTwo = 1.0 / std::sqrt(2.0);
 
-  G4Tubs *tubeBaseSolid = new G4Tubs("SingleStandGussetTubeBaseSolid",
-                                     tubeInnerRadius,
-                                     tubeOuterRadius,
-                                     tubeLength / 2.0,
-                                     0.0,
-                                     360.0 * deg);
+  // Local X is the 4-inch in-plane direction, local Y is the 2-inch stand-Z
+  // direction, and local Z is the tube axis.
+  G4Box *tubeOuterSolid = new G4Box("SingleStandGussetTubeOuterSolid",
+                                    tubeOuterInPlane / 2.0,
+                                    tubeOuterZ / 2.0,
+                                    tubeLength / 2.0);
+  G4Box *tubeInnerSolid = new G4Box("SingleStandGussetTubeInnerSolid",
+                                    tubeInnerInPlane / 2.0,
+                                    tubeInnerZ / 2.0,
+                                    tubeLength / 2.0 + cutterClearance);
+  G4SubtractionSolid *tubeHollowSolid =
+    new G4SubtractionSolid("SingleStandGussetTubeHollowSolid",
+                           tubeOuterSolid,
+                           tubeInnerSolid,
+                           nullptr,
+                           G4ThreeVector());
 
   G4Box *verticalItem12Cutter =
     new G4Box("SingleStandGussetVerticalItem12Cutter",
@@ -667,14 +678,21 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   G4RotationMatrix horizontalItem11Rotation;
   horizontalItem11Rotation.rotateZ(90.0 * deg);
 
+  auto MakeTubeRotation =
+    [](const G4ThreeVector &tubeAxis) -> G4RotationMatrix
+    {
+      G4ThreeVector tubeWidthAxis(-tubeAxis.y(), tubeAxis.x(), 0.0);
+      G4ThreeVector tubeDepthAxis(0.0, 0.0, 1.0);
+      return G4RotationMatrix(tubeWidthAxis, tubeDepthAxis, tubeAxis);
+    };
+
   auto MakeCutTube =
     [&](const G4String &name,
         G4double sideSign,
         const G4ThreeVector &tubePosition,
         const G4ThreeVector &tubeAxis) -> G4SubtractionSolid *
     {
-      G4RotationMatrix tubeRotation;
-      tubeRotation.rotateUz(tubeAxis);
+      G4RotationMatrix tubeRotation = MakeTubeRotation(tubeAxis);
 
       G4RotationMatrix inverseTubeRotation(tubeRotation);
       inverseTubeRotation.invert();
@@ -723,7 +741,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
 
       G4SubtractionSolid *cutVerticalItem12 =
         new G4SubtractionSolid(name + "CutVerticalItem12",
-                               tubeBaseSolid,
+                               tubeHollowSolid,
                                verticalItem12Cutter,
                                verticalItem12Transform);
       G4SubtractionSolid *cutHorizontalItem12 =
@@ -778,10 +796,12 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   leftTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
   rightTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
 
-  G4RotationMatrix *leftTubeRotation = new G4RotationMatrix();
-  leftTubeRotation->rotateUz(leftTubeAxis);
-  G4RotationMatrix *rightTubeRotation = new G4RotationMatrix();
-  rightTubeRotation->rotateUz(rightTubeAxis);
+  G4RotationMatrix leftTubeRotationValue = MakeTubeRotation(leftTubeAxis);
+  G4RotationMatrix rightTubeRotationValue = MakeTubeRotation(rightTubeAxis);
+  G4RotationMatrix *leftTubeRotation =
+    new G4RotationMatrix(leftTubeRotationValue);
+  G4RotationMatrix *rightTubeRotation =
+    new G4RotationMatrix(rightTubeRotationValue);
 
   standAssembly->AddPlacedVolume(leftTubeLV,
                                  leftTubePosition,
