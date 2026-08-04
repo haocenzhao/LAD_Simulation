@@ -52,6 +52,7 @@ void LADDetectorConstructionHodoCreator::BuildSingleStand(
   BuildSingleStandTopPlates(standAssembly, Materials);
   BuildSingleStandVerticalTubes(standAssembly, Materials);
   BuildSingleStandBottomPlates(standAssembly, Materials);
+  BuildSingleStandBraceTubes(standAssembly, Materials);
   BuildSingleStandHorizontalMountingPlates(standAssembly, Materials);
   BuildSingleStandGussetMountingPlates(standAssembly, Materials);
   BuildSingleStandHorizontalWeldment(standAssembly, Materials);
@@ -218,6 +219,196 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandBottomPlates(
 
   standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
   standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildSingleStandBraceTubes(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00006, item 7: two 3 x 3 x 1/4-inch-wall brace tubes per
+  // support leg.  Build and cut each tube in its local frame before placement.
+  const G4double braceLength = 25.125 * inch;
+  const G4double braceOuter = 3.0 * inch;
+  const G4double braceWall = 0.25 * inch;
+  const G4double braceInner = braceOuter - 2.0 * braceWall;
+  const G4double braceAngle = 15.0 * deg;
+  const G4double cutterClearance = 0.1 * mm;
+
+  const G4double legCenterX = 49.25 * inch;
+  const G4double braceCenterY = -143.253785 * inch;
+  const G4double braceCenterZ = 4.799697 * inch;
+
+  const G4double verticalTubeOuter = 6.0 * inch;
+  const G4double verticalTubeLength = 46.25 * inch;
+  const G4double verticalTubeCenterY = -132.875 * inch;
+  const G4double bottomPlateSizeX = 12.0 * inch;
+  const G4double bottomPlateThickness = 1.0 * inch;
+  const G4double bottomPlateSizeZ = 22.0 * inch;
+  const G4double bottomPlateCenterY = -156.5 * inch;
+
+  G4Box *braceOuterSolid = new G4Box("SingleStandBraceTubeOuterSolid",
+                                     braceOuter / 2.0,
+                                     braceOuter / 2.0,
+                                     braceLength / 2.0);
+  G4Box *braceInnerSolid = new G4Box("SingleStandBraceTubeInnerSolid",
+                                     braceInner / 2.0,
+                                     braceInner / 2.0,
+                                     braceLength / 2.0 + cutterClearance);
+  G4SubtractionSolid *braceHollowSolid =
+    new G4SubtractionSolid("SingleStandBraceTubeHollowSolid",
+                           braceOuterSolid,
+                           braceInnerSolid,
+                           nullptr,
+                           G4ThreeVector());
+
+  G4Box *verticalTubeCutter =
+    new G4Box("SingleStandBraceVerticalTubeCutter",
+              verticalTubeOuter / 2.0 + cutterClearance,
+              verticalTubeLength / 2.0 + cutterClearance,
+              verticalTubeOuter / 2.0 + cutterClearance);
+  G4Box *bottomPlateCutter =
+    new G4Box("SingleStandBraceBottomPlateCutter",
+              bottomPlateSizeX / 2.0 + cutterClearance,
+              bottomPlateThickness / 2.0 + cutterClearance,
+              bottomPlateSizeZ / 2.0 + cutterClearance);
+
+  G4RotationMatrix identityRotation;
+
+  auto MakeBraceRotation =
+    [](const G4ThreeVector &braceAxis) -> G4RotationMatrix
+    {
+      G4ThreeVector braceOutOfPlaneAxis(1.0, 0.0, 0.0);
+      G4ThreeVector braceInPlaneAxis(0.0,
+                                     braceAxis.z(),
+                                     -braceAxis.y());
+      return G4RotationMatrix(braceOutOfPlaneAxis,
+                              braceInPlaneAxis,
+                              braceAxis);
+    };
+
+  auto MakeCutBrace =
+    [&](const G4String &name,
+        G4double legSign,
+        const G4ThreeVector &bracePosition,
+        const G4ThreeVector &braceAxis) -> G4SubtractionSolid *
+    {
+      G4RotationMatrix braceRotation = MakeBraceRotation(braceAxis);
+      G4RotationMatrix inverseBraceRotation(braceRotation);
+      inverseBraceRotation.invert();
+
+      G4ThreeVector verticalTubePosition(legSign * legCenterX,
+                                         verticalTubeCenterY,
+                                         0.0);
+      G4ThreeVector bottomPlatePosition(legSign * legCenterX,
+                                        bottomPlateCenterY,
+                                        0.0);
+
+      G4RotationMatrix verticalTubeRotationInBrace =
+        inverseBraceRotation * identityRotation;
+      G4ThreeVector verticalTubePositionInBrace =
+        inverseBraceRotation * (verticalTubePosition - bracePosition);
+      G4Transform3D verticalTubeTransform(verticalTubeRotationInBrace,
+                                          verticalTubePositionInBrace);
+
+      G4RotationMatrix bottomPlateRotationInBrace =
+        inverseBraceRotation * identityRotation;
+      G4ThreeVector bottomPlatePositionInBrace =
+        inverseBraceRotation * (bottomPlatePosition - bracePosition);
+      G4Transform3D bottomPlateTransform(bottomPlateRotationInBrace,
+                                         bottomPlatePositionInBrace);
+
+      G4SubtractionSolid *cutVerticalTube =
+        new G4SubtractionSolid(name + "CutVerticalTube",
+                               braceHollowSolid,
+                               verticalTubeCutter,
+                               verticalTubeTransform);
+      return new G4SubtractionSolid(name + "Solid",
+                                    cutVerticalTube,
+                                    bottomPlateCutter,
+                                    bottomPlateTransform);
+    };
+
+  const G4double sinBraceAngle = std::sin(braceAngle);
+  const G4double cosBraceAngle = std::cos(braceAngle);
+
+  G4ThreeVector leftBackPosition(-legCenterX,
+                                 braceCenterY,
+                                 -braceCenterZ);
+  G4ThreeVector leftFrontPosition(-legCenterX,
+                                  braceCenterY,
+                                  braceCenterZ);
+  G4ThreeVector rightBackPosition(legCenterX,
+                                  braceCenterY,
+                                  -braceCenterZ);
+  G4ThreeVector rightFrontPosition(legCenterX,
+                                   braceCenterY,
+                                   braceCenterZ);
+
+  G4ThreeVector backBraceAxis(0.0, cosBraceAngle, sinBraceAngle);
+  G4ThreeVector frontBraceAxis(0.0, cosBraceAngle, -sinBraceAngle);
+
+  G4SubtractionSolid *leftBackSolid =
+    MakeCutBrace("SingleStandLeftBackBraceTube",
+                 -1.0,
+                 leftBackPosition,
+                 backBraceAxis);
+  G4SubtractionSolid *leftFrontSolid =
+    MakeCutBrace("SingleStandLeftFrontBraceTube",
+                 -1.0,
+                 leftFrontPosition,
+                 frontBraceAxis);
+  G4SubtractionSolid *rightBackSolid =
+    MakeCutBrace("SingleStandRightBackBraceTube",
+                 1.0,
+                 rightBackPosition,
+                 backBraceAxis);
+  G4SubtractionSolid *rightFrontSolid =
+    MakeCutBrace("SingleStandRightFrontBraceTube",
+                 1.0,
+                 rightFrontPosition,
+                 frontBraceAxis);
+
+  G4LogicalVolume *leftBackLV =
+    new G4LogicalVolume(leftBackSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "SingleStandLeftBackBraceTubeLV");
+  G4LogicalVolume *leftFrontLV =
+    new G4LogicalVolume(leftFrontSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "SingleStandLeftFrontBraceTubeLV");
+  G4LogicalVolume *rightBackLV =
+    new G4LogicalVolume(rightBackSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "SingleStandRightBackBraceTubeLV");
+  G4LogicalVolume *rightFrontLV =
+    new G4LogicalVolume(rightFrontSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "SingleStandRightFrontBraceTubeLV");
+
+  G4VisAttributes braceVis(G4Colour(0.27, 0.27, 0.27));
+  leftBackLV->SetVisAttributes(braceVis);
+  leftFrontLV->SetVisAttributes(braceVis);
+  rightBackLV->SetVisAttributes(braceVis);
+  rightFrontLV->SetVisAttributes(braceVis);
+
+  G4RotationMatrix backRotationValue = MakeBraceRotation(backBraceAxis);
+  G4RotationMatrix frontRotationValue = MakeBraceRotation(frontBraceAxis);
+  G4RotationMatrix *backRotation = new G4RotationMatrix(backRotationValue);
+  G4RotationMatrix *frontRotation = new G4RotationMatrix(frontRotationValue);
+
+  standAssembly->AddPlacedVolume(leftBackLV,
+                                 leftBackPosition,
+                                 backRotation);
+  standAssembly->AddPlacedVolume(leftFrontLV,
+                                 leftFrontPosition,
+                                 frontRotation);
+  standAssembly->AddPlacedVolume(rightBackLV,
+                                 rightBackPosition,
+                                 backRotation);
+  standAssembly->AddPlacedVolume(rightFrontLV,
+                                 rightFrontPosition,
+                                 frontRotation);
 }
 
 
@@ -604,9 +795,9 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   LADMaterials *Materials)
 {
   // Drawing 67506-00006, item 8: 4 x 2 x 1/4-inch-wall rectangular tube.
-  // Trim the effective axis-length tube against the mating item 12/item 11
-  // plates and vertical support tube before placing it in the stand assembly.
-  const G4double tubeLength = 21.743533521 * inch;
+  // Start from the full 26-inch tube and trim it against the mating item 12,
+  // item 11, vertical support tube, and horizontal tube before placement.
+  const G4double tubeLength = 26.0 * inch;
   const G4double tubeOuterInPlane = 4.0 * inch;
   const G4double tubeOuterZ = 2.0 * inch;
   const G4double tubeWall = 0.25 * inch;
@@ -620,9 +811,12 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   const G4double item11Thickness = 0.5 * inch;
   const G4double verticalTubeOuter = 6.0 * inch;
   const G4double verticalTubeLength = 46.25 * inch;
+  const G4double horizontalTubeOuter = 6.0 * inch;
+  const G4double horizontalTubeLength = 89.0 * inch;
 
   const G4double verticalTubeCenterX = 49.25 * inch;
   const G4double verticalTubeCenterY = -132.875 * inch;
+  const G4double horizontalTubeCenterY = -122.875 * inch;
   const G4double verticalItem12CenterX = 45.75 * inch;
   const G4double verticalItem12CenterY = -143.0 * inch;
   const G4double verticalItem11CenterX = 45.0 * inch;
@@ -673,6 +867,11 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
               verticalTubeOuter / 2.0 + cutterClearance,
               verticalTubeLength / 2.0 + cutterClearance,
               verticalTubeOuter / 2.0 + cutterClearance);
+  G4Box *horizontalTubeCutter =
+    new G4Box("SingleStandGussetHorizontalTubeCutter",
+              horizontalTubeLength / 2.0 + cutterClearance,
+              horizontalTubeOuter / 2.0 + cutterClearance,
+              horizontalTubeOuter / 2.0 + cutterClearance);
 
   G4RotationMatrix identityRotation;
   G4RotationMatrix horizontalItem11Rotation;
@@ -727,6 +926,9 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
       G4ThreeVector verticalTubePosition(sideSign * verticalTubeCenterX,
                                          verticalTubeCenterY,
                                          0.0);
+      G4ThreeVector horizontalTubePosition(0.0,
+                                           horizontalTubeCenterY,
+                                           0.0);
 
       G4Transform3D verticalItem12Transform =
         ToTubeFrame(verticalItem12Position, identityRotation);
@@ -738,6 +940,8 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
         ToTubeFrame(horizontalItem11Position, horizontalItem11Rotation);
       G4Transform3D verticalTubeTransform =
         ToTubeFrame(verticalTubePosition, identityRotation);
+      G4Transform3D horizontalTubeTransform =
+        ToTubeFrame(horizontalTubePosition, identityRotation);
 
       G4SubtractionSolid *cutVerticalItem12 =
         new G4SubtractionSolid(name + "CutVerticalItem12",
@@ -759,10 +963,15 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
                                cutVerticalItem11,
                                item11Cutter,
                                horizontalItem11Transform);
+      G4SubtractionSolid *cutVerticalTube =
+        new G4SubtractionSolid(name + "CutVerticalTube",
+                               cutHorizontalItem11,
+                               verticalTubeCutter,
+                               verticalTubeTransform);
       return new G4SubtractionSolid(name + "Solid",
-                                    cutHorizontalItem11,
-                                    verticalTubeCutter,
-                                    verticalTubeTransform);
+                                    cutVerticalTube,
+                                    horizontalTubeCutter,
+                                    horizontalTubeTransform);
     };
 
   G4ThreeVector leftTubePosition(-gussetTubeCenterX,

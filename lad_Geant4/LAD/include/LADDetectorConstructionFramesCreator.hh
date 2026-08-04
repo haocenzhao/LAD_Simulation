@@ -20,6 +20,8 @@ void BuildSingleStandVerticalTubes(G4AssemblyVolume *standAssembly,
                                    LADMaterials *Materials);
 void BuildSingleStandBottomPlates(G4AssemblyVolume *standAssembly,
                                   LADMaterials *Materials);
+void BuildSingleStandBraceTubes(G4AssemblyVolume *standAssembly,
+                                LADMaterials *Materials);
 void BuildSingleStandHorizontalMountingPlates(G4AssemblyVolume *standAssembly,
                                               LADMaterials *Materials);
 void BuildSingleStandGussetMountingPlates(G4AssemblyVolume *standAssembly,
