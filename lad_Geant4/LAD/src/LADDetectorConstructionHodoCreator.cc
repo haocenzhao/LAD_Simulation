@@ -200,6 +200,25 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
 
           BuildPanel3Frame(worldLV, Materials, panelIndex, wallPosition, wallRotation);
 
+          // Each double wall has one rigid stand.  Its local Z origin is the
+          // midpoint between the two nominally separated Panel 3 layers, while
+          // both layers and the stand share the averaged alignment correction.
+          if (SubWalls == 2 && ws == SubWalls - 1) {
+            G4ThreeVector doubleWallCenter =
+              G4ThreeVector(vSeparationX[ww],
+                            vSeparationY[ww],
+                            vSeparationZ[ww]) +
+              0.5 * G4ThreeVector(vSpaceX[ww],
+                                  vSpaceY[ww],
+                                  vSpaceZ[ww]) +
+              wallAlignmentShift;
+            BuildDoubleStand(worldLV,
+                             Materials,
+                             ww,
+                             doubleWallCenter,
+                             wallRotation);
+          }
+
           // The third wall has one scintillator layer and uses the single-wall
           // stand defined by drawing 67506-00006.
           if (ww == Constants->NoOfWalls - 1) {

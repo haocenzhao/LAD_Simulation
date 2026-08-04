@@ -10,6 +10,12 @@ void BuildPanel3Frame(G4LogicalVolume *worldLV, LADMaterials *Materials,
                       G4int panelIndex,
                       const G4ThreeVector &hodoCenterHall,
                       const G4RotationMatrix &hodoRotationHall);
+void BuildDoubleStand(G4LogicalVolume *worldLV, LADMaterials *Materials,
+                      G4int wallIndex,
+                      const G4ThreeVector &doubleWallCenterHall,
+                      const G4RotationMatrix &hodoRotationHall);
+void BuildDoubleStandTopAttachmentPlates(
+  G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildSingleStand(G4LogicalVolume *worldLV, LADMaterials *Materials,
                       G4int panelIndex,
                       const G4ThreeVector &hodoCenterHall,

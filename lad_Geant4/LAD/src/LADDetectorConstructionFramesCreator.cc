@@ -37,6 +37,78 @@ void LADDetectorConstructionHodoCreator::BuildPanel3Frame(G4LogicalVolume *world
 }
 
 
+void LADDetectorConstructionHodoCreator::BuildDoubleStand(
+  G4LogicalVolume *worldLV,
+  LADMaterials *Materials,
+  G4int wallIndex,
+  const G4ThreeVector &doubleWallCenterHall,
+  const G4RotationMatrix &hodoRotationHall)
+{
+  // The local origin lies midway between the two corrected Panel 3 centers.
+  // Build the complete rigid stand in that shared Panel 3 coordinate system
+  // before applying the common double-wall alignment correction.
+  G4AssemblyVolume *standAssembly = new G4AssemblyVolume();
+
+  BuildDoubleStandTopAttachmentPlates(standAssembly, Materials);
+
+  // Match the single-wall construction: draw the stand below Panel 3, then
+  // rotate the completed stand before the Panel 3 drawing-orientation change.
+  G4RotationMatrix standRotationInPanel3;
+  standRotationInPanel3.rotateZ(180.0 * deg);
+
+  PlacePanel3LocalAssembly(standAssembly,
+                           worldLV,
+                           wallIndex,
+                           180000,
+                           doubleWallCenterHall,
+                           hodoRotationHall,
+                           standRotationInPanel3);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandTopAttachmentPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010, item 10: two 28 x 12 x 3/4-inch ASTM A36
+  // attachment plates.  Local Z is centered between the two Panel 3 layers;
+  // each plate spans both bottom pads without overlapping them.
+  const G4double plateSizeX = 12.0 * inch;
+  const G4double plateThicknessY = 0.75 * inch;
+  const G4double plateSizeZ = 28.0 * inch;
+
+  const G4double panel3FrameHeight = 216.0 * inch;
+  const G4double panel3PadThickness = 0.75 * inch;
+  const G4double panel3LegInnerClearance = 94.50 * inch;
+  const G4double panel3LegOuterX = 4.0 * inch;
+
+  const G4double plateCenterX =
+    0.5 * (panel3LegInnerClearance + panel3LegOuterX);
+  const G4double panel3BottomPadSurfaceY =
+    -0.5 * panel3FrameHeight - panel3PadThickness;
+  const G4double plateCenterY =
+    panel3BottomPadSurfaceY - 0.5 * plateThicknessY;
+
+  G4Box *plateSolid =
+    new G4Box("DoubleStandTopAttachmentPlateSolid",
+              plateSizeX / 2.0,
+              plateThicknessY / 2.0,
+              plateSizeZ / 2.0);
+
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "DoubleStandTopAttachmentPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.20, 0.20, 0.20)));
+
+  G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
+  G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
+
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
+}
+
+
 void LADDetectorConstructionHodoCreator::BuildSingleStand(
   G4LogicalVolume *worldLV,
   LADMaterials *Materials,
