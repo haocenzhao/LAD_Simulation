@@ -795,8 +795,9 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   LADMaterials *Materials)
 {
   // Drawing 67506-00006, item 8: 4 x 2 x 1/4-inch-wall rectangular tube.
-  // Start from the full 26-inch tube and trim it against the mating item 12,
-  // item 11, vertical support tube, and horizontal tube before placement.
+  // Start from the full 26-inch tube.  Oversized solid item-11 envelopes keep
+  // the real item-11 contact faces fixed while removing everything beyond the
+  // vertical and horizontal mating faces.
   const G4double tubeLength = 26.0 * inch;
   const G4double tubeOuterInPlane = 4.0 * inch;
   const G4double tubeOuterZ = 2.0 * inch;
@@ -805,26 +806,20 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
   const G4double tubeInnerZ = tubeOuterZ - 2.0 * tubeWall;
   const G4double cutterClearance = 0.1 * mm;
 
-  const G4double item12Thickness = 1.0 * inch;
-  const G4double item12LongSize = 6.5 * inch;
-  const G4double plateSizeZ = 6.0 * inch;
-  const G4double item11Thickness = 0.5 * inch;
-  const G4double verticalTubeOuter = 6.0 * inch;
-  const G4double verticalTubeLength = 46.25 * inch;
-  const G4double horizontalTubeOuter = 6.0 * inch;
-  const G4double horizontalTubeLength = 89.0 * inch;
+  const G4double oversizedItem11Thickness = 10.0 * inch;
+  const G4double oversizedItem11HalfThickness =
+    0.5 * oversizedItem11Thickness + cutterClearance;
+  const G4double item11LongSize = 6.5 * inch;
+  const G4double item11SizeZ = 6.0 * inch;
 
-  const G4double verticalTubeCenterX = 49.25 * inch;
-  const G4double verticalTubeCenterY = -132.875 * inch;
-  const G4double horizontalTubeCenterY = -122.875 * inch;
-  const G4double verticalItem12CenterX = 45.75 * inch;
-  const G4double verticalItem12CenterY = -143.0 * inch;
-  const G4double verticalItem11CenterX = 45.0 * inch;
+  const G4double verticalItem11ContactX = 44.75 * inch;
   const G4double verticalItem11CenterY = -143.0 * inch;
-  const G4double horizontalItem12CenterX = 29.125 * inch;
-  const G4double horizontalItem12CenterY = -126.375 * inch;
   const G4double horizontalItem11CenterX = 29.125 * inch;
-  const G4double horizontalItem11CenterY = -127.125 * inch;
+  const G4double horizontalItem11ContactY = -127.375 * inch;
+  const G4double verticalCutterCenterX =
+    verticalItem11ContactX + oversizedItem11HalfThickness;
+  const G4double horizontalCutterCenterY =
+    horizontalItem11ContactY + oversizedItem11HalfThickness;
 
   const G4double gussetTubeCenterX = 36.976714 * inch;
   const G4double gussetTubeCenterY = -135.148286 * inch;
@@ -840,31 +835,11 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
                                     tubeInnerInPlane / 2.0,
                                     tubeInnerZ / 2.0,
                                     tubeLength / 2.0 + cutterClearance);
-  G4Box *verticalItem12Cutter =
-    new G4Box("SingleStandGussetVerticalItem12Cutter",
-              item12Thickness / 2.0 + cutterClearance,
-              item12LongSize / 2.0 + cutterClearance,
-              plateSizeZ / 2.0 + cutterClearance);
-  G4Box *horizontalItem12Cutter =
-    new G4Box("SingleStandGussetHorizontalItem12Cutter",
-              item12LongSize / 2.0 + cutterClearance,
-              item12Thickness / 2.0 + cutterClearance,
-              plateSizeZ / 2.0 + cutterClearance);
-  G4Box *item11Cutter =
-    new G4Box("SingleStandGussetItem11Cutter",
-              item11Thickness / 2.0 + cutterClearance,
-              item12LongSize / 2.0 + cutterClearance,
-              plateSizeZ / 2.0 + cutterClearance);
-  G4Box *verticalTubeCutter =
-    new G4Box("SingleStandGussetVerticalTubeCutter",
-              verticalTubeOuter / 2.0 + cutterClearance,
-              verticalTubeLength / 2.0 + cutterClearance,
-              verticalTubeOuter / 2.0 + cutterClearance);
-  G4Box *horizontalTubeCutter =
-    new G4Box("SingleStandGussetHorizontalTubeCutter",
-              horizontalTubeLength / 2.0 + cutterClearance,
-              horizontalTubeOuter / 2.0 + cutterClearance,
-              horizontalTubeOuter / 2.0 + cutterClearance);
+  G4Box *oversizedItem11Cutter =
+    new G4Box("SingleStandGussetOversizedItem11Cutter",
+              oversizedItem11HalfThickness,
+              item11LongSize / 2.0 + cutterClearance,
+              item11SizeZ / 2.0 + cutterClearance);
 
   G4RotationMatrix identityRotation;
   G4RotationMatrix horizontalItem11Rotation;
@@ -900,75 +875,33 @@ void LADDetectorConstructionHodoCreator::BuildSingleStandGussetTubes(
           return G4Transform3D(rotationInTubeFrame, positionInTubeFrame);
         };
 
-      G4ThreeVector verticalItem12Position(
-        sideSign * verticalItem12CenterX,
-        verticalItem12CenterY,
-        0.0);
-      G4ThreeVector horizontalItem12Position(
-        sideSign * horizontalItem12CenterX,
-        horizontalItem12CenterY,
-        0.0);
-      G4ThreeVector verticalItem11Position(
-        sideSign * verticalItem11CenterX,
+      G4ThreeVector verticalCutterPosition(
+        sideSign * verticalCutterCenterX,
         verticalItem11CenterY,
         0.0);
-      G4ThreeVector horizontalItem11Position(
+      G4ThreeVector horizontalCutterPosition(
         sideSign * horizontalItem11CenterX,
-        horizontalItem11CenterY,
+        horizontalCutterCenterY,
         0.0);
-      G4ThreeVector verticalTubePosition(sideSign * verticalTubeCenterX,
-                                         verticalTubeCenterY,
-                                         0.0);
-      G4ThreeVector horizontalTubePosition(0.0,
-                                           horizontalTubeCenterY,
-                                           0.0);
 
-      G4Transform3D verticalItem12Transform =
-        ToTubeFrame(verticalItem12Position, identityRotation);
-      G4Transform3D horizontalItem12Transform =
-        ToTubeFrame(horizontalItem12Position, identityRotation);
-      G4Transform3D verticalItem11Transform =
-        ToTubeFrame(verticalItem11Position, identityRotation);
-      G4Transform3D horizontalItem11Transform =
-        ToTubeFrame(horizontalItem11Position, horizontalItem11Rotation);
-      G4Transform3D verticalTubeTransform =
-        ToTubeFrame(verticalTubePosition, identityRotation);
-      G4Transform3D horizontalTubeTransform =
-        ToTubeFrame(horizontalTubePosition, identityRotation);
+      G4Transform3D verticalCutterTransform =
+        ToTubeFrame(verticalCutterPosition, identityRotation);
+      G4Transform3D horizontalCutterTransform =
+        ToTubeFrame(horizontalCutterPosition, horizontalItem11Rotation);
 
-      G4SubtractionSolid *cutVerticalItem12 =
-        new G4SubtractionSolid(name + "CutVerticalItem12",
+      G4SubtractionSolid *cutVerticalEnd =
+        new G4SubtractionSolid(name + "CutVerticalEnd",
                                tubeOuterSolid,
-                               verticalItem12Cutter,
-                               verticalItem12Transform);
-      G4SubtractionSolid *cutHorizontalItem12 =
-        new G4SubtractionSolid(name + "CutHorizontalItem12",
-                               cutVerticalItem12,
-                               horizontalItem12Cutter,
-                               horizontalItem12Transform);
-      G4SubtractionSolid *cutVerticalItem11 =
-        new G4SubtractionSolid(name + "CutVerticalItem11",
-                               cutHorizontalItem12,
-                               item11Cutter,
-                               verticalItem11Transform);
-      G4SubtractionSolid *cutHorizontalItem11 =
-        new G4SubtractionSolid(name + "CutHorizontalItem11",
-                               cutVerticalItem11,
-                               item11Cutter,
-                               horizontalItem11Transform);
-      G4SubtractionSolid *cutVerticalTube =
-        new G4SubtractionSolid(name + "CutVerticalTube",
-                               cutHorizontalItem11,
-                               verticalTubeCutter,
-                               verticalTubeTransform);
-      G4SubtractionSolid *cutHorizontalTube =
-        new G4SubtractionSolid(name + "CutHorizontalTube",
-                               cutVerticalTube,
-                               horizontalTubeCutter,
-                               horizontalTubeTransform);
+                               oversizedItem11Cutter,
+                               verticalCutterTransform);
+      G4SubtractionSolid *cutHorizontalEnd =
+        new G4SubtractionSolid(name + "CutHorizontalEnd",
+                               cutVerticalEnd,
+                               oversizedItem11Cutter,
+                               horizontalCutterTransform);
       G4ThreeVector innerCutterPosition;
       return new G4SubtractionSolid(name + "Solid",
-                                    cutHorizontalTube,
+                                    cutHorizontalEnd,
                                     tubeInnerSolid,
                                     nullptr,
                                     innerCutterPosition);
