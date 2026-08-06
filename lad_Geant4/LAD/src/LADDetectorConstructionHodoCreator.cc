@@ -162,8 +162,8 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
       }
 
       // Temporarily disable dxyz and dangle while checking stand clearances:
-      // wallAlignmentShift = G4ThreeVector();
-      // wallAlignmentRotate = G4ThreeVector();
+      wallAlignmentShift = G4ThreeVector();
+      wallAlignmentRotate = G4ThreeVector();
       
       G4cout<<"Wall "<<ww<<G4endl;
 
