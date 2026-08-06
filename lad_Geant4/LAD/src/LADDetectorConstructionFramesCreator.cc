@@ -53,6 +53,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
   BuildDoubleStandLongTube(standAssembly, Materials);
   BuildDoubleStandItem10AttachmentPlates(standAssembly, Materials);
   BuildDoubleStandItem7And8VerticalFrames(standAssembly, Materials);
+  BuildDoubleStandItem12LowerBasePlates(standAssembly, Materials);
 
   // Match the single-wall construction: draw the stand below Panel 3, then
   // rotate the completed stand before the Panel 3 drawing-orientation change.
@@ -328,6 +329,38 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandItem7And8VerticalFrames
   G4ThreeVector rightFramePosition(frameCenterX, frameCenterY, 0.0);
   standAssembly->AddPlacedVolume(item7And8LV, leftFramePosition, nullptr);
   standAssembly->AddPlacedVolume(item7And8LV, rightFramePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandItem12LowerBasePlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010, item 12: one lower base plate below each vertical
+  // weldment.  Its top face touches the open ends of the item-8 side tubes.
+  const G4double plateSizeX = 12.0 * inch;
+  const G4double plateThicknessY = 1.0 * inch;
+  const G4double plateSizeZ = 28.0 * inch;
+  const G4double plateCenterX = 49.25 * inch;
+  const G4double verticalFrameBottomY = -155.0 * inch;
+  const G4double plateCenterY =
+    verticalFrameBottomY - 0.5 * plateThicknessY;
+
+  G4Box *plateSolid =
+    new G4Box("DoubleStandItem12LowerBasePlateSolid",
+              plateSizeX / 2.0,
+              plateThicknessY / 2.0,
+              plateSizeZ / 2.0);
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "DoubleStandItem12LowerBasePlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.20, 0.20, 0.20)));
+
+  G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
+  G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
 }
 
 
