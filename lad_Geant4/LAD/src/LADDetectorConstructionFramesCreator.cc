@@ -51,7 +51,8 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
 
   BuildDoubleStandItem11DetectorAttachmentPlates(standAssembly, Materials);
   BuildDoubleStandLongTube(standAssembly, Materials);
-  BuildDoubleStandHorizontalItem6MidTubes(standAssembly, Materials);
+  BuildDoubleStandItem6MidTubes(standAssembly, Materials);
+  BuildDoubleStandItem13GussetMountingPlates(standAssembly, Materials);
   BuildDoubleStandHorizontalItem12Plates(standAssembly, Materials);
   BuildDoubleStandItem10AttachmentPlates(standAssembly, Materials);
   BuildDoubleStandItem7And8VerticalFrames(standAssembly, Materials);
@@ -182,12 +183,12 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandLongTube(
 }
 
 
-void LADDetectorConstructionHodoCreator::BuildDoubleStandHorizontalItem6MidTubes(
+void LADDetectorConstructionHodoCreator::BuildDoubleStandItem6MidTubes(
   G4AssemblyVolume *standAssembly,
   LADMaterials *Materials)
 {
-  // Drawing 67506-00010, item 6 in the horizontal weldment: two hollow square
-  // tubes span the 10-inch central slot in item 5.
+  // Drawing 67506-00010, item 6: two tubes span the item-5 slot in the
+  // horizontal weldment, and one spans each vertical weldment.
   const G4double tubeSizeX = 6.0 * inch;
   const G4double tubeSizeY = 6.0 * inch;
   const G4double tubeLengthZ = 10.0 * inch;
@@ -195,35 +196,88 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandHorizontalItem6MidTubes
   const G4double booleanTolerance = 0.01 * inch;
 
   G4Box *outerSolid =
-    new G4Box("DoubleStandHorizontalItem6OuterSolid",
+    new G4Box("DoubleStandItem6OuterSolid",
               tubeSizeX / 2.0,
               tubeSizeY / 2.0,
               tubeLengthZ / 2.0);
   G4Box *innerSolid =
-    new G4Box("DoubleStandHorizontalItem6InnerSolid",
+    new G4Box("DoubleStandItem6InnerSolid",
               (tubeSizeX - 2.0 * wallThickness) / 2.0,
               (tubeSizeY - 2.0 * wallThickness) / 2.0,
               tubeLengthZ / 2.0 + booleanTolerance);
   G4SubtractionSolid *tubeSolid =
-    new G4SubtractionSolid("DoubleStandHorizontalItem6Solid",
+    new G4SubtractionSolid("DoubleStandItem6Solid",
                            outerSolid,
                            innerSolid);
   G4LogicalVolume *tubeLV =
     new G4LogicalVolume(tubeSolid,
                         Materials->ASTM_A500_GradeB,
-                        "DoubleStandHorizontalItem6LV");
+                        "DoubleStandItem6LV");
   tubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
 
   const G4double item5OuterLengthX = 104.50 * inch;
   const G4double item5EndToItem6EdgeX = 26.50 * inch;
-  const G4double tubeCenterX =
+  const G4double horizontalTubeCenterX =
     0.5 * item5OuterLengthX - item5EndToItem6EdgeX - 0.5 * tubeSizeX;
-  const G4double tubeCenterY = -112.50 * inch;
+  const G4double horizontalTubeCenterY = -112.50 * inch;
+  const G4double verticalTubeCenterX = 49.25 * inch;
+  const G4double verticalFrameBottomY = -155.0 * inch;
+  const G4double verticalItem6BottomOffsetY = 13.0 * inch;
+  const G4double verticalTubeCenterY =
+    verticalFrameBottomY + verticalItem6BottomOffsetY + 0.5 * tubeSizeY;
 
-  G4ThreeVector leftTubePosition(-tubeCenterX, tubeCenterY, 0.0);
-  G4ThreeVector rightTubePosition(tubeCenterX, tubeCenterY, 0.0);
-  standAssembly->AddPlacedVolume(tubeLV, leftTubePosition, nullptr);
-  standAssembly->AddPlacedVolume(tubeLV, rightTubePosition, nullptr);
+  G4ThreeVector leftHorizontalTubePosition(
+    -horizontalTubeCenterX, horizontalTubeCenterY, 0.0);
+  G4ThreeVector rightHorizontalTubePosition(
+    horizontalTubeCenterX, horizontalTubeCenterY, 0.0);
+  G4ThreeVector leftVerticalTubePosition(
+    -verticalTubeCenterX, verticalTubeCenterY, 0.0);
+  G4ThreeVector rightVerticalTubePosition(
+    verticalTubeCenterX, verticalTubeCenterY, 0.0);
+
+  standAssembly->AddPlacedVolume(
+    tubeLV, leftHorizontalTubePosition, nullptr);
+  standAssembly->AddPlacedVolume(
+    tubeLV, rightHorizontalTubePosition, nullptr);
+  standAssembly->AddPlacedVolume(
+    tubeLV, leftVerticalTubePosition, nullptr);
+  standAssembly->AddPlacedVolume(
+    tubeLV, rightVerticalTubePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandItem13GussetMountingPlates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010, item 13: one 6 x 6 x 1-inch ASTM A36 plate on the
+  // inward X face of each vertical-weldment item-6 tube.
+  const G4double plateThicknessX = 1.0 * inch;
+  const G4double plateSizeY = 6.0 * inch;
+  const G4double plateSizeZ = 6.0 * inch;
+  const G4double item6CenterX = 49.25 * inch;
+  const G4double item6CenterY = -139.0 * inch;
+  const G4double item6SizeX = 6.0 * inch;
+  const G4double plateOffsetX =
+    0.5 * item6SizeX + 0.5 * plateThicknessX;
+
+  G4Box *plateSolid =
+    new G4Box("DoubleStandItem13GussetMountingPlateSolid",
+              plateThicknessX / 2.0,
+              plateSizeY / 2.0,
+              plateSizeZ / 2.0);
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "DoubleStandItem13GussetMountingPlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.22, 0.22, 0.22)));
+
+  G4ThreeVector leftPlatePosition(
+    -item6CenterX + plateOffsetX, item6CenterY, 0.0);
+  G4ThreeVector rightPlatePosition(
+    item6CenterX - plateOffsetX, item6CenterY, 0.0);
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
 }
 
 

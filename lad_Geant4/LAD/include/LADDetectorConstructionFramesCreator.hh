@@ -18,7 +18,9 @@ void BuildDoubleStandItem11DetectorAttachmentPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildDoubleStandLongTube(G4AssemblyVolume *standAssembly,
                               LADMaterials *Materials);
-void BuildDoubleStandHorizontalItem6MidTubes(
+void BuildDoubleStandItem6MidTubes(
+  G4AssemblyVolume *standAssembly, LADMaterials *Materials);
+void BuildDoubleStandItem13GussetMountingPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildDoubleStandHorizontalItem12Plates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
