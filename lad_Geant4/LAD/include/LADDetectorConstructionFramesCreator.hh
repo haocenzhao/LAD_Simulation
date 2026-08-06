@@ -24,6 +24,8 @@ void BuildDoubleStandItem13GussetMountingPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildDoubleStandHorizontalItem12Plates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
+void BuildDoubleStandItem14GussetAttachmentPlates(
+  G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildDoubleStandItem10AttachmentPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildDoubleStandItem7And8VerticalFrames(
