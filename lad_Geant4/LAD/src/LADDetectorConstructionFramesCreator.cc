@@ -52,6 +52,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
   BuildDoubleStandItem11DetectorAttachmentPlates(standAssembly, Materials);
   BuildDoubleStandLongTube(standAssembly, Materials);
   BuildDoubleStandItem10AttachmentPlates(standAssembly, Materials);
+  BuildDoubleStandItem7And8VerticalFrames(standAssembly, Materials);
 
   // Match the single-wall construction: draw the stand below Panel 3, then
   // rotate the completed stand before the Panel 3 drawing-orientation change.
@@ -223,6 +224,110 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandItem10AttachmentPlates(
     plateLV, leftVerticalPlatePosition, nullptr);
   standAssembly->AddPlacedVolume(
     plateLV, rightVerticalPlatePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandItem7And8VerticalFrames(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010: each vertical weldment combines one item-7 end tube
+  // and two item-8 vertical side tubes into a continuous hollow U-shaped frame.
+  const G4double frameSizeX = 6.0 * inch;
+  const G4double frameSizeY = 38.0 * inch;
+  const G4double frameSizeZ = 22.0 * inch;
+  const G4double memberWidth = 6.0 * inch;
+  const G4double centralOpeningSizeZ = 10.0 * inch;
+  const G4double wallThickness = 0.375 * inch;
+  const G4double booleanTolerance = 0.01 * inch;
+
+  const G4double frameHalfY = frameSizeY / 2.0;
+  const G4double centralOpeningTopY = frameHalfY - memberWidth;
+  const G4double throughBottomY = -frameHalfY - 2.0 * booleanTolerance;
+
+  G4Box *outerBlock =
+    new G4Box("DoubleStandItem7And8OuterBlock",
+              frameSizeX / 2.0,
+              frameSizeY / 2.0,
+              frameSizeZ / 2.0);
+
+  const G4double centralOpeningSizeY =
+    centralOpeningTopY - throughBottomY;
+  const G4double centralOpeningCenterY =
+    0.5 * (centralOpeningTopY + throughBottomY);
+  G4Box *centralOpening =
+    new G4Box("DoubleStandItem7And8CentralOpening",
+              frameSizeX / 2.0 + booleanTolerance,
+              centralOpeningSizeY / 2.0,
+              centralOpeningSizeZ / 2.0);
+  G4ThreeVector centralOpeningPosition(
+    0.0, centralOpeningCenterY, 0.0);
+  G4SubtractionSolid *solidFrame =
+    new G4SubtractionSolid("DoubleStandItem7And8SolidFrame",
+                           outerBlock,
+                           centralOpening,
+                           nullptr,
+                           centralOpeningPosition);
+
+  // Form one U-shaped cavity whose bottom extends beyond the two item-8 ends.
+  // This leaves a constant wall on the top, front/back, outer and inner faces.
+  const G4double cavityOuterSizeX = frameSizeX - 2.0 * wallThickness;
+  const G4double cavityOuterSizeZ = frameSizeZ - 2.0 * wallThickness;
+  const G4double cavityOuterTopY = frameHalfY - wallThickness;
+  const G4double cavityOuterSizeY = cavityOuterTopY - throughBottomY;
+  const G4double cavityOuterCenterY =
+    0.5 * (cavityOuterTopY + throughBottomY);
+
+  G4Box *cavityOuterBlock =
+    new G4Box("DoubleStandItem7And8CavityOuterBlock",
+              cavityOuterSizeX / 2.0,
+              cavityOuterSizeY / 2.0,
+              cavityOuterSizeZ / 2.0);
+
+  const G4double cavityOpeningSizeZ =
+    centralOpeningSizeZ + 2.0 * wallThickness;
+  const G4double cavityOpeningTopY =
+    centralOpeningTopY + wallThickness;
+  const G4double cavityOpeningBottomY =
+    throughBottomY - booleanTolerance;
+  const G4double cavityOpeningSizeY =
+    cavityOpeningTopY - cavityOpeningBottomY;
+  const G4double cavityOpeningCenterY =
+    0.5 * (cavityOpeningTopY + cavityOpeningBottomY);
+  G4Box *cavityCentralOpening =
+    new G4Box("DoubleStandItem7And8CavityCentralOpening",
+              cavityOuterSizeX / 2.0 + booleanTolerance,
+              cavityOpeningSizeY / 2.0,
+              cavityOpeningSizeZ / 2.0);
+  G4ThreeVector cavityOpeningPosition(
+    0.0, cavityOpeningCenterY - cavityOuterCenterY, 0.0);
+  G4SubtractionSolid *hollowingCutter =
+    new G4SubtractionSolid("DoubleStandItem7And8HollowingCutter",
+                           cavityOuterBlock,
+                           cavityCentralOpening,
+                           nullptr,
+                           cavityOpeningPosition);
+
+  G4ThreeVector hollowingCutterPosition(0.0, cavityOuterCenterY, 0.0);
+  G4SubtractionSolid *item7And8Solid =
+    new G4SubtractionSolid("DoubleStandItem7And8Solid",
+                           solidFrame,
+                           hollowingCutter,
+                           nullptr,
+                           hollowingCutterPosition);
+  G4LogicalVolume *item7And8LV =
+    new G4LogicalVolume(item7And8Solid,
+                        Materials->ASTM_A500_GradeB,
+                        "DoubleStandItem7And8LV");
+  item7And8LV->SetVisAttributes(
+    G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
+
+  const G4double frameCenterX = 49.25 * inch;
+  const G4double frameCenterY = -136.0 * inch;
+  G4ThreeVector leftFramePosition(-frameCenterX, frameCenterY, 0.0);
+  G4ThreeVector rightFramePosition(frameCenterX, frameCenterY, 0.0);
+  standAssembly->AddPlacedVolume(item7And8LV, leftFramePosition, nullptr);
+  standAssembly->AddPlacedVolume(item7And8LV, rightFramePosition, nullptr);
 }
 
 

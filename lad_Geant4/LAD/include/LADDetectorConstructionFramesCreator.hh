@@ -20,6 +20,8 @@ void BuildDoubleStandLongTube(G4AssemblyVolume *standAssembly,
                               LADMaterials *Materials);
 void BuildDoubleStandItem10AttachmentPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
+void BuildDoubleStandItem7And8VerticalFrames(
+  G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildSingleStand(G4LogicalVolume *worldLV, LADMaterials *Materials,
                       G4int panelIndex,
                       const G4ThreeVector &hodoCenterHall,
