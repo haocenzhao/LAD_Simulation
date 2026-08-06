@@ -1293,26 +1293,14 @@ void LADDetectorConstructionHodoCreator::PlacePanel3LocalAssembly(
   const G4RotationMatrix &assemblyRotationInPanel3)
 {
 
-  // The hodo wall rests against Panel 3; their centers should therefore differ
-  // along the local wall-normal direction.  This first approximation is kept as
-  // explicit variables because the item-8/channel interface will be refined
-  // later:
-  //
-  //   center spacing = 1/2 * (hodo wall thickness + mount tube width)
-  //                  + item-8 channel width
-  //                  + clearance between hodo wall and channel
-  //
-  // Local Z is the hodo-wall thickness direction in the current wall geometry.
-  // Flip the sign of panel3FrameOffsetZ if visualization shows the frame on the
-  // wrong side of the hodo wall.
+  // Local +Z points from the origin toward the nominal wall center, so the
+  // wall face nearer the origin is at -WallThick/2.  Before any dxyz/dangle
+  // correction, place the Panel 3 center plane 10.5 inches from that face in
+  // the +Z direction.
   const G4double hodoWallThickness = WallThick;
-  const G4double mountTubeWidth = 6.0 * inch;
-  const G4double item8ChannelWidth = 1.625 * inch; // Unistrut P1000 nominal width
-  const G4double panel3HodoClearance = 0.5 * inch;
+  const G4double wallFrontToPanel3Center = 10.5 * inch;
   const G4double panel3FrameOffsetZ =
-    0.5 * (hodoWallThickness + mountTubeWidth) +
-    item8ChannelWidth +
-    panel3HodoClearance;
+    -0.5 * hodoWallThickness + wallFrontToPanel3Center;
 
   G4ThreeVector frameOffsetLocal(0.0, 0.0, panel3FrameOffsetZ);
   G4ThreeVector frameCenterHall =
