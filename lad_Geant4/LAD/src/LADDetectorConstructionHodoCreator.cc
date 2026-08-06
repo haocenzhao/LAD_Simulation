@@ -148,9 +148,8 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
       //Maybe a while loop could be more efficient
 
       // A double-wall stand is one rigid structure, so both of its panels must
-      // retain their nominal relative pose.  Apply the component-wise average
-      // alignment correction to both layers.  The single wall keeps its own
-      // layer-0 correction.
+      // retain their nominal relative pose.  Compute the component-wise average
+      // correction for both layers; the single wall uses its layer-0 values.
       G4ThreeVector wallAlignmentShift = Variables->hodoShift[ww][0];
       G4ThreeVector wallAlignmentRotate = Variables->hodoRotate[ww][0];
       if (SubWalls == 2) {
@@ -161,6 +160,12 @@ void LADDetectorConstructionHodoCreator::BuildHodo(G4LogicalVolume *worldLV, LAD
           0.5 * (Variables->hodoRotate[ww][0] +
                  Variables->hodoRotate[ww][1]);
       }
+
+      // Temporarily disable dxyz and dangle while checking stand clearances.
+      // Keep the calculations above intact so the corrections can be restored
+      // by removing only these two assignments.
+      wallAlignmentShift = G4ThreeVector();
+      wallAlignmentRotate = G4ThreeVector();
       
       G4cout<<"Wall "<<ww<<G4endl;
 
