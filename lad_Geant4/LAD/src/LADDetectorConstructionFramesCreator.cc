@@ -52,6 +52,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
   BuildDoubleStandItem11DetectorAttachmentPlates(standAssembly, Materials);
   BuildDoubleStandLongTube(standAssembly, Materials);
   BuildDoubleStandHorizontalItem6MidTubes(standAssembly, Materials);
+  BuildDoubleStandHorizontalItem12Plates(standAssembly, Materials);
   BuildDoubleStandItem10AttachmentPlates(standAssembly, Materials);
   BuildDoubleStandItem7And8VerticalFrames(standAssembly, Materials);
   BuildDoubleStandItem12LowerBasePlates(standAssembly, Materials);
@@ -223,6 +224,38 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandHorizontalItem6MidTubes
   G4ThreeVector rightTubePosition(tubeCenterX, tubeCenterY, 0.0);
   standAssembly->AddPlacedVolume(tubeLV, leftTubePosition, nullptr);
   standAssembly->AddPlacedVolume(tubeLV, rightTubePosition, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandHorizontalItem12Plates(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010: two 6 x 1 x 6-inch ASTM A36 plates are centered
+  // directly below the item-6 tubes in the horizontal weldment.
+  const G4double plateSizeX = 6.0 * inch;
+  const G4double plateThicknessY = 1.0 * inch;
+  const G4double plateSizeZ = 6.0 * inch;
+  const G4double plateCenterX = 22.75 * inch;
+  const G4double item6BottomSurfaceY = -115.50 * inch;
+  const G4double plateCenterY =
+    item6BottomSurfaceY - 0.5 * plateThicknessY;
+
+  G4Box *plateSolid =
+    new G4Box("DoubleStandHorizontalItem12PlateSolid",
+              plateSizeX / 2.0,
+              plateThicknessY / 2.0,
+              plateSizeZ / 2.0);
+  G4LogicalVolume *plateLV =
+    new G4LogicalVolume(plateSolid,
+                        Materials->ASTM_A36,
+                        "DoubleStandHorizontalItem12PlateLV");
+  plateLV->SetVisAttributes(G4VisAttributes(G4Colour(0.20, 0.20, 0.20)));
+
+  G4ThreeVector leftPlatePosition(-plateCenterX, plateCenterY, 0.0);
+  G4ThreeVector rightPlatePosition(plateCenterX, plateCenterY, 0.0);
+  standAssembly->AddPlacedVolume(plateLV, leftPlatePosition, nullptr);
+  standAssembly->AddPlacedVolume(plateLV, rightPlatePosition, nullptr);
 }
 
 

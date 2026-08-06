@@ -20,6 +20,8 @@ void BuildDoubleStandLongTube(G4AssemblyVolume *standAssembly,
                               LADMaterials *Materials);
 void BuildDoubleStandHorizontalItem6MidTubes(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
+void BuildDoubleStandHorizontalItem12Plates(
+  G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildDoubleStandItem10AttachmentPlates(
   G4AssemblyVolume *standAssembly, LADMaterials *Materials);
 void BuildDoubleStandItem7And8VerticalFrames(
