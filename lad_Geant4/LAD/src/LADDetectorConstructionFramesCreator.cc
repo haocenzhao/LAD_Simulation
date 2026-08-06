@@ -51,6 +51,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
 
   BuildDoubleStandItem11DetectorAttachmentPlates(standAssembly, Materials);
   BuildDoubleStandLongTube(standAssembly, Materials);
+  BuildDoubleStandHorizontalItem6MidTubes(standAssembly, Materials);
   BuildDoubleStandItem10AttachmentPlates(standAssembly, Materials);
   BuildDoubleStandItem7And8VerticalFrames(standAssembly, Materials);
   BuildDoubleStandItem12LowerBasePlates(standAssembly, Materials);
@@ -177,6 +178,51 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandLongTube(
 
   G4ThreeVector item5Position(0.0, -112.50 * inch, 0.0);
   standAssembly->AddPlacedVolume(item5LV, item5Position, nullptr);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandHorizontalItem6MidTubes(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010, item 6 in the horizontal weldment: two hollow square
+  // tubes span the 10-inch central slot in item 5.
+  const G4double tubeSizeX = 6.0 * inch;
+  const G4double tubeSizeY = 6.0 * inch;
+  const G4double tubeLengthZ = 10.0 * inch;
+  const G4double wallThickness = 0.375 * inch;
+  const G4double booleanTolerance = 0.01 * inch;
+
+  G4Box *outerSolid =
+    new G4Box("DoubleStandHorizontalItem6OuterSolid",
+              tubeSizeX / 2.0,
+              tubeSizeY / 2.0,
+              tubeLengthZ / 2.0);
+  G4Box *innerSolid =
+    new G4Box("DoubleStandHorizontalItem6InnerSolid",
+              (tubeSizeX - 2.0 * wallThickness) / 2.0,
+              (tubeSizeY - 2.0 * wallThickness) / 2.0,
+              tubeLengthZ / 2.0 + booleanTolerance);
+  G4SubtractionSolid *tubeSolid =
+    new G4SubtractionSolid("DoubleStandHorizontalItem6Solid",
+                           outerSolid,
+                           innerSolid);
+  G4LogicalVolume *tubeLV =
+    new G4LogicalVolume(tubeSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "DoubleStandHorizontalItem6LV");
+  tubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
+
+  const G4double item5OuterLengthX = 104.50 * inch;
+  const G4double item5EndToItem6EdgeX = 26.50 * inch;
+  const G4double tubeCenterX =
+    0.5 * item5OuterLengthX - item5EndToItem6EdgeX - 0.5 * tubeSizeX;
+  const G4double tubeCenterY = -112.50 * inch;
+
+  G4ThreeVector leftTubePosition(-tubeCenterX, tubeCenterY, 0.0);
+  G4ThreeVector rightTubePosition(tubeCenterX, tubeCenterY, 0.0);
+  standAssembly->AddPlacedVolume(tubeLV, leftTubePosition, nullptr);
+  standAssembly->AddPlacedVolume(tubeLV, rightTubePosition, nullptr);
 }
 
 
