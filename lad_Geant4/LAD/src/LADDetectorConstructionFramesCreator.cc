@@ -55,6 +55,7 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStand(
   BuildDoubleStandItem13GussetMountingPlates(standAssembly, Materials);
   BuildDoubleStandHorizontalItem12Plates(standAssembly, Materials);
   BuildDoubleStandItem14GussetAttachmentPlates(standAssembly, Materials);
+  BuildDoubleStandItem9GussetTubes(standAssembly, Materials);
   BuildDoubleStandItem10AttachmentPlates(standAssembly, Materials);
   BuildDoubleStandItem7And8VerticalFrames(standAssembly, Materials);
   BuildDoubleStandItem12LowerBasePlates(standAssembly, Materials);
@@ -365,6 +366,166 @@ void LADDetectorConstructionHodoCreator::BuildDoubleStandItem14GussetAttachmentP
     plateLV, leftHorizontalPlatePosition, horizontalPlateRotation);
   standAssembly->AddPlacedVolume(
     plateLV, rightHorizontalPlatePosition, horizontalPlateRotation);
+}
+
+
+void LADDetectorConstructionHodoCreator::BuildDoubleStandItem9GussetTubes(
+  G4AssemblyVolume *standAssembly,
+  LADMaterials *Materials)
+{
+  // Drawing 67506-00010, item 9: two 35-inch 4 x 2 x 1/4-inch-wall
+  // rectangular tubes.  Oversized solid item-14 envelopes trim each tube at
+  // the two item-14 contact faces before the hollow core is subtracted.
+  const G4double tubeLength = 35.0 * inch;
+  const G4double tubeOuterInPlane = 4.0 * inch;
+  const G4double tubeOuterZ = 2.0 * inch;
+  const G4double tubeWall = 0.25 * inch;
+  const G4double tubeInnerInPlane = tubeOuterInPlane - 2.0 * tubeWall;
+  const G4double tubeInnerZ = tubeOuterZ - 2.0 * tubeWall;
+  const G4double cutterClearance = 0.1 * mm;
+
+  const G4double oversizedItem14Thickness = 10.0 * inch;
+  const G4double oversizedItem14HalfThickness =
+    0.5 * oversizedItem14Thickness + cutterClearance;
+  const G4double item14LongSize = 6.5 * inch;
+  const G4double item14SizeZ = 6.0 * inch;
+
+  const G4double horizontalItem14CenterX = 22.75 * inch;
+  const G4double horizontalItem14ContactY = -117.0 * inch;
+  const G4double horizontalCutterCenterY =
+    horizontalItem14ContactY + oversizedItem14HalfThickness;
+  const G4double verticalItem14ContactX = 44.75 * inch;
+  const G4double verticalItem14CenterY = -139.0 * inch;
+  const G4double verticalCutterCenterX =
+    verticalItem14ContactX + oversizedItem14HalfThickness;
+
+  const G4double tubeCenterX = 33.789214 * inch;
+  const G4double tubeCenterY = -127.960786 * inch;
+  const G4double inverseSqrtTwo = 1.0 / std::sqrt(2.0);
+
+  // Local X is the 4-inch in-plane direction, local Y is the 2-inch stand-Z
+  // direction, and local Z is the tube axis.
+  G4Box *tubeOuterSolid =
+    new G4Box("DoubleStandItem9GussetTubeOuterSolid",
+              tubeOuterInPlane / 2.0,
+              tubeOuterZ / 2.0,
+              tubeLength / 2.0);
+  G4Box *tubeInnerSolid =
+    new G4Box("DoubleStandItem9GussetTubeInnerSolid",
+              tubeInnerInPlane / 2.0,
+              tubeInnerZ / 2.0,
+              tubeLength / 2.0 + cutterClearance);
+  G4Box *oversizedItem14Cutter =
+    new G4Box("DoubleStandItem9OversizedItem14Cutter",
+              oversizedItem14HalfThickness,
+              item14LongSize / 2.0 + cutterClearance,
+              item14SizeZ / 2.0 + cutterClearance);
+
+  G4RotationMatrix identityRotation;
+  G4RotationMatrix horizontalItem14Rotation;
+  horizontalItem14Rotation.rotateZ(90.0 * deg);
+
+  auto MakeTubeRotation =
+    [](const G4ThreeVector &tubeAxis) -> G4RotationMatrix
+    {
+      G4ThreeVector tubeWidthAxis(-tubeAxis.y(), tubeAxis.x(), 0.0);
+      G4ThreeVector tubeDepthAxis(0.0, 0.0, 1.0);
+      return G4RotationMatrix(tubeWidthAxis, tubeDepthAxis, tubeAxis);
+    };
+
+  auto MakeCutTube =
+    [&](const G4String &name,
+        G4double sideSign,
+        const G4ThreeVector &tubePosition,
+        const G4ThreeVector &tubeAxis) -> G4SubtractionSolid *
+    {
+      G4RotationMatrix tubeRotation = MakeTubeRotation(tubeAxis);
+      G4RotationMatrix inverseTubeRotation(tubeRotation);
+      inverseTubeRotation.invert();
+
+      auto ToTubeFrame =
+        [&](const G4ThreeVector &cutterPosition,
+            const G4RotationMatrix &cutterRotation) -> G4Transform3D
+        {
+          G4RotationMatrix rotationInTubeFrame =
+            inverseTubeRotation * cutterRotation;
+          G4ThreeVector positionInTubeFrame =
+            inverseTubeRotation * (cutterPosition - tubePosition);
+          return G4Transform3D(rotationInTubeFrame, positionInTubeFrame);
+        };
+
+      G4ThreeVector horizontalCutterPosition(
+        sideSign * horizontalItem14CenterX,
+        horizontalCutterCenterY,
+        0.0);
+      G4ThreeVector verticalCutterPosition(
+        sideSign * verticalCutterCenterX,
+        verticalItem14CenterY,
+        0.0);
+
+      G4Transform3D horizontalCutterTransform =
+        ToTubeFrame(horizontalCutterPosition, horizontalItem14Rotation);
+      G4Transform3D verticalCutterTransform =
+        ToTubeFrame(verticalCutterPosition, identityRotation);
+
+      G4SubtractionSolid *cutHorizontalEnd =
+        new G4SubtractionSolid(name + "CutHorizontalEnd",
+                               tubeOuterSolid,
+                               oversizedItem14Cutter,
+                               horizontalCutterTransform);
+      G4SubtractionSolid *cutVerticalEnd =
+        new G4SubtractionSolid(name + "CutVerticalEnd",
+                               cutHorizontalEnd,
+                               oversizedItem14Cutter,
+                               verticalCutterTransform);
+      G4ThreeVector innerCutterPosition;
+      return new G4SubtractionSolid(name + "Solid",
+                                    cutVerticalEnd,
+                                    tubeInnerSolid,
+                                    nullptr,
+                                    innerCutterPosition);
+    };
+
+  G4ThreeVector leftTubePosition(-tubeCenterX, tubeCenterY, 0.0);
+  G4ThreeVector rightTubePosition(tubeCenterX, tubeCenterY, 0.0);
+  G4ThreeVector leftTubeAxis(inverseSqrtTwo, inverseSqrtTwo, 0.0);
+  G4ThreeVector rightTubeAxis(-inverseSqrtTwo, inverseSqrtTwo, 0.0);
+
+  G4SubtractionSolid *leftTubeSolid =
+    MakeCutTube("DoubleStandLeftItem9GussetTube",
+                -1.0,
+                leftTubePosition,
+                leftTubeAxis);
+  G4SubtractionSolid *rightTubeSolid =
+    MakeCutTube("DoubleStandRightItem9GussetTube",
+                1.0,
+                rightTubePosition,
+                rightTubeAxis);
+
+  G4LogicalVolume *leftTubeLV =
+    new G4LogicalVolume(leftTubeSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "DoubleStandLeftItem9GussetTubeLV");
+  G4LogicalVolume *rightTubeLV =
+    new G4LogicalVolume(rightTubeSolid,
+                        Materials->ASTM_A500_GradeB,
+                        "DoubleStandRightItem9GussetTubeLV");
+  leftTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
+  rightTubeLV->SetVisAttributes(G4VisAttributes(G4Colour(0.27, 0.27, 0.27)));
+
+  G4RotationMatrix leftTubeRotationValue = MakeTubeRotation(leftTubeAxis);
+  G4RotationMatrix rightTubeRotationValue = MakeTubeRotation(rightTubeAxis);
+  G4RotationMatrix *leftTubeRotation =
+    new G4RotationMatrix(leftTubeRotationValue);
+  G4RotationMatrix *rightTubeRotation =
+    new G4RotationMatrix(rightTubeRotationValue);
+
+  standAssembly->AddPlacedVolume(leftTubeLV,
+                                 leftTubePosition,
+                                 leftTubeRotation);
+  standAssembly->AddPlacedVolume(rightTubeLV,
+                                 rightTubePosition,
+                                 rightTubeRotation);
 }
 
 
